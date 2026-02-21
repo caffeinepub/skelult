@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-comprehensive-react-error-boundaries-to-catch-and-display-rendering-errors-in-app-tsx-wrapping-the-router-component-to-prevent-white-screens-from-javascript-errors",
-      "featureTitle": "Add comprehensive React error boundaries to catch and display rendering errors in App.tsx, wrapping the Router component to prevent white screens from JavaScript errors",
+      "featureId": "feature-add-the-skelult-logo-bold-geometric-text-with-cyan-ult-accent-to-the-top-left-corner-of-the-layout-component-header-ensuring-it-is-small-in-size-and-displays-consistently-in-both-light-and-dark-modes",
+      "featureTitle": "Add the SkelUlt logo (bold geometric text with cyan 'ULT' accent) to the top-left corner of the Layout component header, ensuring it is small in size and displays consistently in both light and dark modes",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/ErrorBoundary.tsx"
+        "frontend/src/components/Layout.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,15 +17,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-32"
+        "REQ-40"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-try-catch-blocks-and-null-safety-checks-to-all-react-query-hooks-in-usequeries-ts-to-handle-backend-connection-failures-gracefully",
-      "featureTitle": "Add try-catch blocks and null safety checks to all React Query hooks in useQueries.ts to handle backend connection failures gracefully",
+      "featureId": "feature-add-an-enable-button-next-to-the-like-button-on-all-videos-in-videocard-component-that-allows-users-to-follow-subscribe-to-the-video-creator-s-channel",
+      "featureTitle": "Add an Enable button next to the like button on all videos in VideoCard component that allows users to follow/subscribe to the video creator's channel",
       "files": [
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/components/VideoCard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -38,19 +37,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-33"
+        "REQ-41"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-fallback-loading-states-and-null-checks-to-feedpage-tsx-vidlespage-tsx-profilepage-tsx-videodetailpage-tsx-and-messagingpage-tsx-to-prevent-rendering-failures-when-data-is-unavailable",
-      "featureTitle": "Add fallback loading states and null checks to FeedPage.tsx, VidlesPage.tsx, ProfilePage.tsx, VideoDetailPage.tsx, and MessagingPage.tsx to prevent rendering failures when data is unavailable",
+      "featureId": "feature-implement-smooth-animation-for-the-enable-disable-button-that-transforms-the-button-state-from-enable-to-disable-on-click-with-visual-transition-effects",
+      "featureTitle": "Implement smooth animation for the Enable/Disable button that transforms the button state from 'Enable' to 'Disable' on click with visual transition effects",
       "files": [
-        "frontend/src/pages/FeedPage.tsx",
-        "frontend/src/pages/MessagingPage.tsx",
-        "frontend/src/pages/ProfilePage.tsx",
-        "frontend/src/pages/VideoDetailPage.tsx",
-        "frontend/src/pages/VidlesPage.tsx"
+        "frontend/src/components/VideoCard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -62,15 +57,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-34"
+        "REQ-42"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-verify-and-fix-the-router-configuration-in-app-tsx-to-ensure-all-routes-vidles-profile-userid-video-videoid-messages-are-properly-defined-and-accessible",
-      "featureTitle": "Verify and fix the router configuration in App.tsx to ensure all routes (/, /vidles, /profile/:userId, /video/:videoId, /messages) are properly defined and accessible",
+      "featureId": "feature-implement-disable-button-functionality-that-allows-users-to-unfollow-unsubscribe-from-the-video-creator-s-channel-when-clicked-in-the-disable-state",
+      "featureTitle": "Implement Disable button functionality that allows users to unfollow/unsubscribe from the video creator's channel when clicked in the Disable state",
       "files": [
-        "frontend/src/App.tsx"
+        "frontend/src/components/VideoCard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -82,100 +77,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-35"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-defensive-checks-in-useinternetidentity-ts-and-useactor-ts-to-handle-authentication-initialization-failures-and-prevent-crashes-when-internet-identity-is-unavailable",
-      "featureTitle": "Add defensive checks in useInternetIdentity.ts and useActor.ts to handle authentication initialization failures and prevent crashes when Internet Identity is unavailable",
-      "files": [
-        "frontend/src/components/LoginButton.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-36"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-safe-fallbacks-and-validation-to-videocard-tsx-videogrid-tsx-and-all-video-related-components-to-handle-missing-video-data-properties-url-title-uploader-without-crashing",
-      "featureTitle": "Add safe fallbacks and validation to VideoCard.tsx, VideoGrid.tsx, and all video-related components to handle missing video data properties (url, title, uploader) without crashing",
-      "files": [
-        "frontend/src/components/VideoCard.tsx",
-        "frontend/src/components/VideoGrid.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-37"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-review-and-fix-any-import-errors-missing-dependencies-or-module-resolution-issues-in-all-frontend-files-that-could-prevent-the-application-bundle-from-loading-correctly",
-      "featureTitle": "Review and fix any import errors, missing dependencies, or module resolution issues in all frontend files that could prevent the application bundle from loading correctly",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/VideoCard.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/FeedPage.tsx",
-        "frontend/src/pages/MessagingPage.tsx",
-        "frontend/src/pages/ProfilePage.tsx",
-        "frontend/src/pages/VideoDetailPage.tsx",
-        "frontend/src/pages/VidlesPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-38"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-console-logging-at-critical-initialization-points-main-tsx-app-tsx-route-components-to-help-diagnose-where-the-application-fails-to-render-if-white-screen-persists-after-fixes",
-      "featureTitle": "Add console logging at critical initialization points (main.tsx, App.tsx, route components) to help diagnose where the application fails to render if white screen persists after fixes",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/pages/FeedPage.tsx",
-        "frontend/src/pages/MessagingPage.tsx",
-        "frontend/src/pages/ProfilePage.tsx",
-        "frontend/src/pages/VideoDetailPage.tsx",
-        "frontend/src/pages/VidlesPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-39"
+        "REQ-43"
       ],
       "confidence": "high"
     }

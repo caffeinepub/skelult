@@ -1,182 +1,104 @@
 {
   "kind": "build_request",
-  "title": "Fix white screen issue preventing SkelUlt from loading after Version 5 deployment",
+  "title": "Add SkelUlt logo and Enable/Disable follow button with animation",
   "projectName": "SkelUlt",
-  "priority": "high",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-32",
-      "text": "Add comprehensive React error boundaries to catch and display rendering errors in App.tsx, wrapping the Router component to prevent white screens from JavaScript errors",
+      "id": "REQ-40",
+      "text": "Add the SkelUlt logo (bold geometric text with cyan 'ULT' accent) to the top-left corner of the Layout component header, ensuring it is small in size and displays consistently in both light and dark modes",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-10",
+          "msg-11"
         ],
         "quotes": [
-          "when i open the website, its just all white screen! please fix it right now"
+          "add the logo right now at top left, it should be small but same in light or dark mode"
         ]
       },
       "acceptanceCriteria": [
-        "Error boundary component is created that catches React rendering errors",
-        "Error boundary wraps the main Router component in App.tsx",
-        "When errors occur, a user-friendly error message is displayed instead of white screen",
-        "Error details are logged to console for debugging"
+        "Logo appears in the top-left corner of the Layout header",
+        "Logo is small and does not overwhelm other header elements",
+        "Logo displays with consistent styling in both light and dark theme modes",
+        "Logo uses the generated image asset from frontend/public/assets/generated"
       ]
     },
     {
-      "id": "REQ-33",
-      "text": "Add try-catch blocks and null safety checks to all React Query hooks in useQueries.ts to handle backend connection failures gracefully",
+      "id": "REQ-41",
+      "text": "Add an Enable button next to the like button on all videos in VideoCard component that allows users to follow/subscribe to the video creator's channel",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-9",
+          "msg-12"
         ],
         "quotes": [
-          "check all the codings and if there's an error, fix it quickly"
+          "add \"Enable\" button which is same as follow/subscribe button, this should appear next to the like button",
+          "\"Enable\" button should have animation after clicking, turning into \"disable\" from which people can unfollow/unsubscribe the channel"
         ]
       },
       "acceptanceCriteria": [
-        "All useQuery and useMutation hooks have proper error handling",
-        "Null checks are added for actor instances before making backend calls",
-        "Failed queries display loading states or error messages instead of crashing",
-        "Network errors are caught and handled with user-friendly messages"
+        "Enable button appears next to the like button on all video cards",
+        "Button text displays 'Enable' when the user is not following the video creator",
+        "Clicking the Enable button follows/subscribes to the video creator",
+        "Button smoothly animates and transitions to 'Disable' state after clicking"
       ]
     },
     {
-      "id": "REQ-34",
-      "text": "Add fallback loading states and null checks to FeedPage.tsx, VidlesPage.tsx, ProfilePage.tsx, VideoDetailPage.tsx, and MessagingPage.tsx to prevent rendering failures when data is unavailable",
+      "id": "REQ-42",
+      "text": "Implement smooth animation for the Enable/Disable button that transforms the button state from 'Enable' to 'Disable' on click with visual transition effects",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-12"
         ],
         "quotes": [
-          "THE WEBSITE IS NOT WORKING",
-          "its just all white screen"
+          "\"Enable\" button should have animation after clicking, turning into \"disable\""
         ]
       },
       "acceptanceCriteria": [
-        "All page components handle undefined or null data gracefully",
-        "Loading skeletons or spinners are shown while data is being fetched",
-        "Empty states are displayed when no data is available",
-        "No page crashes due to missing or undefined props"
+        "Button smoothly animates when transitioning between Enable and Disable states",
+        "Visual transition effects are consistent with the neon-inspired design theme",
+        "Animation completes within a reasonable timeframe (300-500ms)",
+        "Button remains interactive and responsive during and after animation"
       ]
     },
     {
-      "id": "REQ-35",
-      "text": "Verify and fix the router configuration in App.tsx to ensure all routes (/, /vidles, /profile/:userId, /video/:videoId, /messages) are properly defined and accessible",
+      "id": "REQ-43",
+      "text": "Implement Disable button functionality that allows users to unfollow/unsubscribe from the video creator's channel when clicked in the Disable state",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-12"
         ],
         "quotes": [
-          "check all the codings and if there's an error"
+          "turning into \"disable\" from which people can unfollow/unsubscribe the channel"
         ]
       },
       "acceptanceCriteria": [
-        "All routes are correctly configured with proper path patterns",
-        "Navigation between routes works without errors",
-        "404 or fallback route is defined for invalid paths",
-        "Route parameters are properly extracted and validated"
-      ]
-    },
-    {
-      "id": "REQ-36",
-      "text": "Add defensive checks in useInternetIdentity.ts and useActor.ts to handle authentication initialization failures and prevent crashes when Internet Identity is unavailable",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "white screen",
-          "fix it quickly"
-        ]
-      },
-      "acceptanceCriteria": [
-        "AuthClient initialization errors are caught and handled gracefully",
-        "App continues to function in anonymous mode if authentication fails",
-        "User is shown a clear error message if Internet Identity is unavailable",
-        "No white screen occurs due to authentication initialization failures"
-      ]
-    },
-    {
-      "id": "REQ-37",
-      "text": "Add safe fallbacks and validation to VideoCard.tsx, VideoGrid.tsx, and all video-related components to handle missing video data properties (url, title, uploader) without crashing",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "check all the codings and if there's an error, fix it quickly"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Components display placeholder content when video properties are missing",
-        "No console errors from undefined property access",
-        "Video player has fallback behavior for invalid video URLs",
-        "All optional properties are checked before rendering"
-      ]
-    },
-    {
-      "id": "REQ-38",
-      "text": "Review and fix any import errors, missing dependencies, or module resolution issues in all frontend files that could prevent the application bundle from loading correctly",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "white screen issue",
-          "check all the codings"
-        ]
-      },
-      "acceptanceCriteria": [
-        "All import statements resolve to valid modules",
-        "No circular dependencies exist in the codebase",
-        "All required npm packages are properly installed",
-        "TypeScript compilation completes without errors"
-      ]
-    },
-    {
-      "id": "REQ-39",
-      "text": "Add console logging at critical initialization points (main.tsx, App.tsx, route components) to help diagnose where the application fails to render if white screen persists after fixes",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "white screen",
-          "fix it quickly"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Console logs are added at app initialization in main.tsx",
-        "Each route component logs when it mounts",
-        "Provider initialization (QueryClient, InternetIdentity) is logged",
-        "Logs help identify where rendering stops in case of persistent issues"
+        "Clicking the Disable button unfollows/unsubscribes from the video creator",
+        "Button smoothly animates back to 'Enable' state after unfollowing",
+        "Follow/unfollow action updates the user's follow list immediately (optimistic UI)",
+        "Follow state persists correctly after page refresh"
       ]
     }
   ],
   "constraints": [
-    "Do not modify immutable frontend paths: useInternetIdentity.ts, useInternetIdentity.tsx, useActor.ts, main.tsx, frontend/src/components/ui",
-    "Maintain single-actor backend architecture in backend/main.mo",
-    "Preserve existing functionality while adding error handling",
-    "Do not change the application's core features or user-facing behavior",
-    "Keep all existing styling and visual design intact"
+    "Do not modify backend schema or main.mo actor file",
+    "Use existing follow system infrastructure from FollowButton component",
+    "Do not edit immutable frontend paths: useInternetIdentity.ts, useActor.ts, main.tsx, frontend/src/components/ui"
   ],
   "nonGoals": [
-    "Updating the logo design (deferred until white screen is fixed)",
-    "Adding new features or functionality",
-    "Modifying backend Motoko code unless absolutely necessary",
-    "Changing the UI design or styling",
-    "Refactoring code that is already working correctly"
+    "Creating a new follow system separate from the existing one",
+    "Modifying backend follow/unfollow logic",
+    "Adding notification features for follows",
+    "Implementing analytics or tracking for button interactions"
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "SkelUlt logo with bold geometric text featuring dark gray 'SKEL' letters and cyan 'ULT' accent on transparent background, optimized for header display (skelult-logo.dim_200x60.png)"
+    ],
     "edits": []
   }
 }

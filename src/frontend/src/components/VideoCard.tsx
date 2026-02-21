@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Trash2 } from 'lucide-react';
+import { MessageCircle, Trash2, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,9 +17,11 @@ import {
 import { Video, ContentType } from '../backend';
 import LikeButton from './LikeButton';
 import ShareButton from './ShareButton';
-import { useGetUserProfile, useDeleteVideo } from '../hooks/useQueries';
+import { useGetUserProfile, useDeleteVideo, useFollowUser, useUnfollowUser } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
+import { Principal } from '@dfinity/principal';
 
 interface VideoCardProps {
   video: Video;
@@ -31,12 +33,16 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
   const { data: uploaderProfile } = useGetUserProfile(video.uploader.toString());
   const { identity } = useInternetIdentity();
   const deleteVideo = useDeleteVideo();
+  const followUser = useFollowUser();
+  const unfollowUser = useUnfollowUser();
   const [isPlaying, setIsPlaying] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const videoUrl = video.videoFile?.getDirectURL() || '';
   const uploadDate = new Date(Number(video.uploadTime) / 1000000);
   
+  const isAuthenticated = !!identity;
   const isOwnVideo = identity && video.uploader.toString() === identity.getPrincipal().toString();
   const isVidle = video.contentType === ContentType.vidle;
 
@@ -63,6 +69,45 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
     deleteVideo.mutate(video.id);
     setShowDeleteDialog(false);
   };
+
+  const handleFollowToggle = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error('Please login to follow users');
+      return;
+    }
+
+    if (isOwnVideo) {
+      toast.error('You cannot follow yourself');
+      return;
+    }
+
+    const previousState = isFollowing;
+    setIsFollowing(!isFollowing);
+
+    try {
+      if (isFollowing) {
+        await unfollowUser.mutateAsync(video.uploader);
+        toast.success('Unfollowed successfully');
+      } else {
+        await followUser.mutateAsync(video.uploader);
+        toast.success('Following successfully');
+      }
+    } catch (error: any) {
+      setIsFollowing(previousState);
+      
+      if (error.message?.includes('Already following')) {
+        toast.info('You are already following this user');
+      } else if (error.message?.includes('Cannot follow yourself')) {
+        toast.error('You cannot follow yourself');
+      } else {
+        toast.error(`Failed to ${isFollowing ? 'unfollow' : 'follow'} user`);
+      }
+    }
+  };
+
+  const isPending = followUser.isPending || unfollowUser.isPending;
 
   return (
     <>
@@ -145,6 +190,41 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
             <div className="flex items-center gap-4 pt-2 border-t border-border/50">
               <LikeButton videoId={video.id} initialLikes={Number(video.likes || 0)} />
               
+              {/* Enable/Disable Follow Button */}
+              {!isOwnVideo && (
+                <button
+                  onClick={handleFollowToggle}
+                  disabled={!isAuthenticated || isPending}
+                  className={`
+                    flex items-center gap-2 px-4 py-1.5 rounded-full font-semibold text-sm
+                    transition-all duration-300 transform
+                    ${isFollowing 
+                      ? 'bg-muted text-muted-foreground hover:bg-muted/80 border-2 border-border' 
+                      : 'bg-accent text-accent-foreground hover:bg-accent/90 neon-glow border-2 border-accent'
+                    }
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    hover:scale-105 active:scale-95
+                  `}
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>{isFollowing ? 'Disabling...' : 'Enabling...'}</span>
+                    </>
+                  ) : isFollowing ? (
+                    <>
+                      <UserCheck className="h-4 w-4" />
+                      <span>Disable</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="h-4 w-4" />
+                      <span>Enable</span>
+                    </>
+                  )}
+                </button>
+              )}
+
               <button 
                 className="flex items-center gap-2 text-muted-foreground hover:text-secondary transition-colors"
                 onClick={(e) => {

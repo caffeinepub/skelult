@@ -1,140 +1,57 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T09:17:53.903Z",
+  "generatedAt": "2026-02-21T09:32:07.009Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 8,
-    "implemented": 8,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-32",
-        "summary": "Add comprehensive React error boundaries to catch and display rendering errors in App.tsx, wrapping the Router component to prevent white screens from JavaScript errors",
+        "id": "REQ-40",
+        "summary": "Add the SkelUlt logo (bold geometric text with cyan 'ULT' accent) to the top-left corner of the Layout component header, ensuring it is small in size and displays consistently in both light and dark modes",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/ErrorBoundary.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/Layout.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/ErrorBoundary.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/Layout.tsx"
         ]
       },
       {
-        "id": "REQ-33",
-        "summary": "Add try-catch blocks and null safety checks to all React Query hooks in useQueries.ts to handle backend connection failures gracefully",
+        "id": "REQ-41",
+        "summary": "Add an Enable button next to the like button on all videos in VideoCard component that allows users to follow/subscribe to the video creator's channel",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-34",
-        "summary": "Add fallback loading states and null checks to FeedPage.tsx, VidlesPage.tsx, ProfilePage.tsx, VideoDetailPage.tsx, and MessagingPage.tsx to prevent rendering failures when data is unavailable",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/FeedPage.tsx",
-          "frontend/src/pages/VidlesPage.tsx",
-          "frontend/src/pages/ProfilePage.tsx",
-          "frontend/src/pages/VideoDetailPage.tsx",
-          "frontend/src/pages/MessagingPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/FeedPage.tsx",
-          "frontend/src/pages/VidlesPage.tsx",
-          "frontend/src/pages/ProfilePage.tsx",
-          "frontend/src/pages/VideoDetailPage.tsx",
-          "frontend/src/pages/MessagingPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-35",
-        "summary": "Verify and fix the router configuration in App.tsx to ensure all routes (/, /vidles, /profile/:userId, /video/:videoId, /messages) are properly defined and accessible",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-36",
-        "summary": "Add defensive checks in useInternetIdentity.ts and useActor.ts to handle authentication initialization failures and prevent crashes when Internet Identity is unavailable",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useInternetIdentity.tsx",
-          "frontend/src/components/LoginButton.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/LoginButton.tsx"
-        ]
-      },
-      {
-        "id": "REQ-37",
-        "summary": "Add safe fallbacks and validation to VideoCard.tsx, VideoGrid.tsx, and all video-related components to handle missing video data properties (url, title, uploader) without crashing",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/VideoCard.tsx",
-          "frontend/src/components/VideoGrid.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/VideoCard.tsx",
-          "frontend/src/components/VideoGrid.tsx"
-        ]
-      },
-      {
-        "id": "REQ-38",
-        "summary": "Review and fix any import errors, missing dependencies, or module resolution issues in all frontend files that could prevent the application bundle from loading correctly",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/pages/FeedPage.tsx",
-          "frontend/src/pages/VidlesPage.tsx",
-          "frontend/src/pages/ProfilePage.tsx",
-          "frontend/src/pages/VideoDetailPage.tsx",
-          "frontend/src/pages/MessagingPage.tsx",
-          "frontend/src/hooks/useQueries.ts",
           "frontend/src/components/VideoCard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/pages/FeedPage.tsx",
-          "frontend/src/pages/VidlesPage.tsx",
-          "frontend/src/pages/ProfilePage.tsx",
-          "frontend/src/pages/VideoDetailPage.tsx",
-          "frontend/src/pages/MessagingPage.tsx",
-          "frontend/src/hooks/useQueries.ts",
           "frontend/src/components/VideoCard.tsx"
         ]
       },
       {
-        "id": "REQ-39",
-        "summary": "Add console logging at critical initialization points (main.tsx, App.tsx, route components) to help diagnose where the application fails to render if white screen persists after fixes",
+        "id": "REQ-42",
+        "summary": "Implement smooth animation for the Enable/Disable button that transforms the button state from 'Enable' to 'Disable' on click with visual transition effects",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/main.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/FeedPage.tsx",
-          "frontend/src/pages/VidlesPage.tsx",
-          "frontend/src/pages/ProfilePage.tsx",
-          "frontend/src/pages/VideoDetailPage.tsx",
-          "frontend/src/pages/MessagingPage.tsx",
-          "frontend/src/hooks/useActor.ts"
+          "frontend/src/components/VideoCard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/pages/FeedPage.tsx",
-          "frontend/src/pages/VidlesPage.tsx",
-          "frontend/src/pages/ProfilePage.tsx",
-          "frontend/src/pages/VideoDetailPage.tsx",
-          "frontend/src/pages/MessagingPage.tsx"
+          "frontend/src/components/VideoCard.tsx"
+        ]
+      },
+      {
+        "id": "REQ-43",
+        "summary": "Implement Disable button functionality that allows users to unfollow/unsubscribe from the video creator's channel when clicked in the Disable state",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/VideoCard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/VideoCard.tsx"
         ]
       }
     ]
@@ -144,17 +61,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/components/ErrorBoundary.tsx",
-    "frontend/src/components/LoginButton.tsx",
+    "frontend/public/assets/generated/skelult-logo.dim_200x60.png",
+    "frontend/src/components/Layout.tsx",
     "frontend/src/components/VideoCard.tsx",
-    "frontend/src/components/VideoGrid.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/FeedPage.tsx",
-    "frontend/src/pages/MessagingPage.tsx",
-    "frontend/src/pages/ProfilePage.tsx",
-    "frontend/src/pages/VideoDetailPage.tsx",
-    "frontend/src/pages/VidlesPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

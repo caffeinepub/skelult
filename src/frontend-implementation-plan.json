@@ -1,246 +1,73 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix white screen issue preventing SkelUlt from loading after Version 5 deployment",
+  "title": "Add SkelUlt logo and Enable/Disable follow button with animation",
   "requirements": [
     {
-      "id": "REQ-32",
-      "summary": "Add comprehensive React error boundaries to catch and display rendering errors in App.tsx, wrapping the Router component to prevent white screens from JavaScript errors",
+      "id": "REQ-40",
+      "summary": "Add SkelUlt logo to Layout header with consistent light/dark mode styling",
       "acceptanceCriteria": [
-        "Error boundary component is created that catches React rendering errors",
-        "Error boundary wraps the main Router component in App.tsx",
-        "When errors occur, a user-friendly error message is displayed instead of white screen",
-        "Error details are logged to console for debugging"
+        "Logo appears in the top-left corner of the Layout header",
+        "Logo is small and does not overwhelm other header elements",
+        "Logo displays with consistent styling in both light and dark theme modes",
+        "Logo uses the generated image asset from frontend/public/assets/generated"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/ErrorBoundary.tsx",
-          "operation": "create",
-          "description": "Create a React error boundary component that catches rendering errors in child components. The component should maintain error state, log errors to console with stack traces, and display a user-friendly fallback UI with an error message and a 'Reload' button that refreshes the page. Include proper TypeScript typing for props (children: ReactNode) and state (hasError: boolean, error: Error | null)."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/Layout.tsx",
           "operation": "modify",
-          "description": "Wrap the entire Router component tree with the ErrorBoundary component to catch any rendering errors that occur in route components or their children. Import ErrorBoundary from './components/ErrorBoundary' and place it as the outermost wrapper inside the ThemeProvider, ensuring all route-based rendering is protected. Verify the component's usage before implementing."
+          "description": "Add the SkelUlt logo image to the header's top-left corner using the generated asset at frontend/public/assets/generated/skelult-logo.dim_256x256.png. Position the logo before the navigation links, apply appropriate sizing (small, non-intrusive), and ensure it renders consistently in both light and dark modes without additional styling variations. The logo should link to the feed page for easy navigation to home."
         }
       ]
     },
     {
-      "id": "REQ-33",
-      "summary": "Add try-catch blocks and null safety checks to all React Query hooks in useQueries.ts to handle backend connection failures gracefully",
+      "id": "REQ-41",
+      "summary": "Add Enable button next to like button on VideoCard for following video creators",
       "acceptanceCriteria": [
-        "All useQuery and useMutation hooks have proper error handling",
-        "Null checks are added for actor instances before making backend calls",
-        "Failed queries display loading states or error messages instead of crashing",
-        "Network errors are caught and handled with user-friendly messages"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add defensive null checks for the actor instance in all query and mutation functions before making backend calls. Wrap async operations in try-catch blocks to handle network errors gracefully. For each useQuery hook, add 'retry: false' or 'retry: 1' to prevent excessive retries on persistent failures. Ensure queryFn implementations throw meaningful errors when actor is unavailable (e.g., 'throw new Error(\"Backend connection not available\")') so React Query's error handling can surface them properly. Add enabled conditions like 'enabled: !!actor && !actorFetching' where appropriate to prevent queries from running before the actor is ready."
-        }
-      ]
-    },
-    {
-      "id": "REQ-34",
-      "summary": "Add fallback loading states and null checks to FeedPage.tsx, VidlesPage.tsx, ProfilePage.tsx, VideoDetailPage.tsx, and MessagingPage.tsx to prevent rendering failures when data is unavailable",
-      "acceptanceCriteria": [
-        "All page components handle undefined or null data gracefully",
-        "Loading skeletons or spinners are shown while data is being fetched",
-        "Empty states are displayed when no data is available",
-        "No page crashes due to missing or undefined props"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/FeedPage.tsx",
-          "operation": "modify",
-          "description": "Add null and undefined checks for the videos array returned by useGetMostLikedVideos. Display a loading spinner or skeleton UI when isLoading is true. Show an empty state message when data is an empty array or null. Ensure the component gracefully handles the case where the query fails by checking isError and displaying an error message. Prevent any mapping operations on undefined or null data by using optional chaining (videos?.map) or early returns."
-        },
-        {
-          "path": "frontend/src/pages/VidlesPage.tsx",
-          "operation": "modify",
-          "description": "Add null and undefined checks for the vidles array. Display a loading state while data is being fetched using isLoading from the query. Show an empty state with a helpful message when no vidles are available. Handle error states by checking isError and displaying a user-friendly error message. Use optional chaining when mapping over the vidles array to prevent crashes from undefined data."
-        },
-        {
-          "path": "frontend/src/pages/ProfilePage.tsx",
-          "operation": "modify",
-          "description": "Add null checks for userProfile and userVideos data. Display loading states for both profile and videos queries using their respective isLoading flags. Show appropriate empty states when profile data is null or videos array is empty. Handle cases where the user does not exist by checking for null profile after loading completes and displaying a 'User not found' message. Add optional chaining for all profile property accesses (e.g., userProfile?.username, userProfile?.bio) to prevent undefined access errors."
-        },
-        {
-          "path": "frontend/src/pages/VideoDetailPage.tsx",
-          "operation": "modify",
-          "description": "Add null checks for the video object returned by useGetVideo. Display a loading spinner while isLoading is true. Handle the case where video is null after loading by showing a 'Video not found' message. Add null checks for nested properties like video?.uploader before accessing them. Use optional chaining for all video property accesses throughout the component. Handle query errors by checking isError and displaying an error message."
-        },
-        {
-          "path": "frontend/src/pages/MessagingPage.tsx",
-          "operation": "modify",
-          "description": "Add null checks for conversation partners list and messages array. Display loading states for both queries using isLoading flags. Handle empty states when no conversations or messages exist with appropriate placeholder messages. Add optional chaining when accessing message properties. Ensure the selected conversation state handles cases where the selected user might not exist in the current data. Add error handling for both queries by checking isError states and displaying error messages."
-        }
-      ]
-    },
-    {
-      "id": "REQ-35",
-      "summary": "Verify and fix the router configuration in App.tsx to ensure all routes (/, /vidles, /profile/:userId, /video/:videoId, /messages) are properly defined and accessible",
-      "acceptanceCriteria": [
-        "All routes are correctly configured with proper path patterns",
-        "Navigation between routes works without errors",
-        "404 or fallback route is defined for invalid paths",
-        "Route parameters are properly extracted and validated"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Review all route definitions to ensure they match the expected paths: '/' for FeedPage, '/vidles' for VidlesPage, '/profile/:userId' for ProfilePage, '/video/:videoId' for VideoDetailPage, and '/messages' for MessagingPage. Verify that route parameters are correctly specified with colons (e.g., :userId, :videoId). Add a catch-all fallback route (path='*') that redirects to the home page or displays a 404 component. Ensure all route components are properly imported and there are no typos in path definitions. Test that the router correctly parses route parameters and passes them to the page components."
-        }
-      ]
-    },
-    {
-      "id": "REQ-36",
-      "summary": "Add defensive checks in useInternetIdentity.ts and useActor.ts to handle authentication initialization failures and prevent crashes when Internet Identity is unavailable",
-      "acceptanceCriteria": [
-        "AuthClient initialization errors are caught and handled gracefully",
-        "App continues to function in anonymous mode if authentication fails",
-        "User is shown a clear error message if Internet Identity is unavailable",
-        "No white screen occurs due to authentication initialization failures"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useInternetIdentity.tsx",
-          "operation": "modify",
-          "description": "NOTE: This file is marked as immutable in constraints. Do not modify this file. Instead, ensure that components consuming this hook handle potential errors from login/clear operations gracefully by wrapping calls in try-catch blocks."
-        },
-        {
-          "path": "frontend/src/components/LoginButton.tsx",
-          "operation": "modify",
-          "description": "Add comprehensive error handling around the login() call. Wrap the login operation in a try-catch block to catch and log any authentication initialization failures. Display a toast or error message to the user if Internet Identity is unavailable or login fails. Ensure the button does not become permanently disabled if login fails. Handle edge cases where the identity service might be temporarily unavailable by providing a retry mechanism or helpful error message. The component should gracefully degrade to show an error state without crashing the entire application."
-        }
-      ]
-    },
-    {
-      "id": "REQ-37",
-      "summary": "Add safe fallbacks and validation to VideoCard.tsx, VideoGrid.tsx, and all video-related components to handle missing video data properties (url, title, uploader) without crashing",
-      "acceptanceCriteria": [
-        "Components display placeholder content when video properties are missing",
-        "No console errors from undefined property access",
-        "Video player has fallback behavior for invalid video URLs",
-        "All optional properties are checked before rendering"
+        "Enable button appears next to the like button on all video cards",
+        "Button text displays 'Enable' when the user is not following the video creator",
+        "Clicking the Enable button follows/subscribes to the video creator",
+        "Button smoothly animates and transitions to 'Disable' state after clicking"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/VideoCard.tsx",
           "operation": "modify",
-          "description": "Add null and undefined checks for all video properties before rendering them. Use optional chaining for accessing nested properties like video?.videoFile, video?.title, video?.uploader. Provide fallback values for missing data: display 'Untitled Video' if title is missing, use the default avatar from frontend/public/assets/generated/default-avatar.dim_200x200.png if uploader info is unavailable, and show a placeholder or error message if videoFile is missing. Add error handling to the video player component to gracefully handle invalid video URLs. Ensure the component does not crash when video data is incomplete."
-        },
-        {
-          "path": "frontend/src/components/VideoGrid.tsx",
-          "operation": "modify",
-          "description": "Add null checks before mapping over the videos array. Use optional chaining when accessing video properties in the grid items. Provide fallback thumbnail images using frontend/public/assets/generated/video-placeholder.dim_1920x1080.png when video thumbnails are unavailable. Handle cases where individual video objects might be null or malformed by filtering them out or showing placeholder cards. Ensure the grid displays gracefully even when some video data is incomplete."
+          "description": "Add an Enable/Disable button next to the LikeButton in the video card's action button row. Use the existing FollowButton component infrastructure to handle follow/unfollow logic. Position the button between the like button and other action buttons. The button should check if the current user is following the video uploader and display 'Enable' (not following) or 'Disable' (following) accordingly. Include authentication checks to ensure only logged-in users can interact with the button. Verify the FollowButton component's usage instructions before implementing to ensure proper integration with the existing follow system."
         }
       ]
     },
     {
-      "id": "REQ-38",
-      "summary": "Review and fix any import errors, missing dependencies, or module resolution issues in all frontend files that could prevent the application bundle from loading correctly",
+      "id": "REQ-42",
+      "summary": "Implement smooth animation for Enable/Disable button state transitions",
       "acceptanceCriteria": [
-        "All import statements resolve to valid modules",
-        "No circular dependencies exist in the codebase",
-        "All required npm packages are properly installed",
-        "TypeScript compilation completes without errors"
+        "Button smoothly animates when transitioning between Enable and Disable states",
+        "Visual transition effects are consistent with the neon-inspired design theme",
+        "Animation completes within a reasonable timeframe (300-500ms)",
+        "Button remains interactive and responsive during and after animation"
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Review all import statements to ensure they point to existing files with correct paths. Check that all imported components, hooks, and utilities are properly exported from their source files. Verify that relative paths are correct (e.g., './components/...' vs '../components/...'). Fix any typos in import paths. Ensure all imported types from backend.d.ts are correctly referenced. Remove any unused imports that might cause confusion or bundling issues."
-        },
-        {
-          "path": "frontend/src/pages/FeedPage.tsx",
-          "operation": "modify",
-          "description": "Verify all import statements resolve correctly, including imports for VideoCard, ProfileSetupModal, and query hooks. Check that all dependencies are properly installed in package.json. Fix any incorrect relative paths or missing file extensions if needed by TypeScript/build tooling."
-        },
-        {
-          "path": "frontend/src/pages/VidlesPage.tsx",
-          "operation": "modify",
-          "description": "Review imports for components and hooks, ensuring all paths are correct and files exist. Verify that VideoCard and other imported components are properly exported from their source files."
-        },
-        {
-          "path": "frontend/src/pages/ProfilePage.tsx",
-          "operation": "modify",
-          "description": "Check all import statements for correctness, including imports for VideoGrid, EditProfileModal, FollowButton, and hooks. Ensure relative paths are accurate and no circular dependencies exist with other page or component files."
-        },
-        {
-          "path": "frontend/src/pages/VideoDetailPage.tsx",
-          "operation": "modify",
-          "description": "Verify imports for VideoCard, CommentSection, CommentInput, and related hooks. Check that all imported types and components are correctly exported and paths are valid."
-        },
-        {
-          "path": "frontend/src/pages/MessagingPage.tsx",
-          "operation": "modify",
-          "description": "Review imports for ConversationList, ChatThread, and messaging-related hooks. Ensure all paths are correct and no circular dependencies exist."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Verify that imports from backend.d.ts are correct and all types are properly exported. Check that the useActor hook import path is correct. Ensure no circular dependencies exist between hooks files."
-        },
         {
           "path": "frontend/src/components/VideoCard.tsx",
           "operation": "modify",
-          "description": "Review all import statements for components, hooks, and types. Verify that all imported UI components from './ui/' directory exist and are properly exported. Check for any missing or incorrect imports that could cause bundling issues."
+          "description": "Add CSS transition effects to the Enable/Disable button for smooth state changes. Implement a transition animation (300-500ms duration) that includes visual feedback such as background color shift, scale transform, or opacity changes when toggling between Enable and Disable states. Use Tailwind's transition utilities and neon-themed colors from the existing design system (cyan accents, dark/light mode compatible). Ensure the button remains clickable and responsive throughout the animation. The animation should feel polished and consistent with the app's neon-inspired aesthetic."
         }
       ]
     },
     {
-      "id": "REQ-39",
-      "summary": "Add console logging at critical initialization points (main.tsx, App.tsx, route components) to help diagnose where the application fails to render if white screen persists after fixes",
+      "id": "REQ-43",
+      "summary": "Implement Disable button functionality for unfollowing video creators",
       "acceptanceCriteria": [
-        "Console logs are added at app initialization in main.tsx",
-        "Each route component logs when it mounts",
-        "Provider initialization (QueryClient, InternetIdentity) is logged",
-        "Logs help identify where rendering stops in case of persistent issues"
+        "Clicking the Disable button unfollows/unsubscribes from the video creator",
+        "Button smoothly animates back to 'Enable' state after unfollowing",
+        "Follow/unfollow action updates the user's follow list immediately (optimistic UI)",
+        "Follow state persists correctly after page refresh"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/main.tsx",
+          "path": "frontend/src/components/VideoCard.tsx",
           "operation": "modify",
-          "description": "NOTE: This file is marked as immutable in constraints. Do not modify this file. Add diagnostic logging to the nearest modifiable entry point instead."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Add console.log statements at the top of the App component function to log 'App component rendering'. Add a useEffect hook that logs 'App component mounted' when the component first mounts. Log when providers are initialized and when the router is about to render. These logs will help diagnose if the App component itself is failing to mount or if the failure occurs deeper in the component tree."
-        },
-        {
-          "path": "frontend/src/pages/FeedPage.tsx",
-          "operation": "modify",
-          "description": "Add console.log('FeedPage rendering') at the start of the component function. Add a useEffect with an empty dependency array that logs 'FeedPage mounted' when the component first mounts. Log the loading state and data availability to help diagnose data fetching issues."
-        },
-        {
-          "path": "frontend/src/pages/VidlesPage.tsx",
-          "operation": "modify",
-          "description": "Add console.log('VidlesPage rendering') at component start. Add a mount effect that logs 'VidlesPage mounted'. Include logging for query states to help identify if the page fails during data loading."
-        },
-        {
-          "path": "frontend/src/pages/ProfilePage.tsx",
-          "operation": "modify",
-          "description": "Add console.log('ProfilePage rendering with userId:', userId) at component start to log both rendering and the route parameter. Add a mount effect that logs 'ProfilePage mounted'. Log query states for profile and videos data."
-        },
-        {
-          "path": "frontend/src/pages/VideoDetailPage.tsx",
-          "operation": "modify",
-          "description": "Add console.log('VideoDetailPage rendering with videoId:', videoId) at component start. Add a mount effect logging 'VideoDetailPage mounted'. Log video data loading states and availability."
-        },
-        {
-          "path": "frontend/src/pages/MessagingPage.tsx",
-          "operation": "modify",
-          "description": "Add console.log('MessagingPage rendering') at component start. Add a mount effect that logs 'MessagingPage mounted'. Log authentication state and data loading states to help diagnose messaging initialization issues."
-        },
-        {
-          "path": "frontend/src/hooks/useActor.ts",
-          "operation": "modify",
-          "description": "NOTE: This file is marked as immutable in constraints. Do not modify this file directly. Ensure that components using this hook log the actor availability state to help diagnose actor initialization issues."
+          "description": "Implement the unfollow functionality for the Disable button state. When clicked in the Disable state, the button should call the unfollowUser mutation from useQueries hook to unsubscribe from the video creator. Apply optimistic UI updates so the button immediately transitions back to 'Enable' state before the backend confirms the action. Include error handling with toast notifications if the unfollow action fails. Ensure the follow state persists correctly by relying on the existing React Query cache invalidation patterns in useQueries. The button should animate smoothly back to the Enable state using the same transition effects defined in REQ-42."
         }
       ]
     }

@@ -36,11 +36,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             onClick={() => navigate({ to: '/' })}
           >
             <img 
-              src="/assets/generated/skelult-logo.dim_256x256.png" 
+              src="/assets/generated/skelult-logo.dim_200x60.png" 
               alt="SkelUlt Logo" 
-              className="h-10 w-10 group-hover:scale-110 transition-transform"
+              className="h-8 w-auto group-hover:scale-105 transition-transform"
             />
-            <h1 className="text-2xl font-bold text-gradient">SkelUlt</h1>
           </div>
 
           {/* Navigation */}

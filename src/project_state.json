@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
+  "projectStateVersion": 15,
   "summary": "SkelUlt: A unified social media video platform combining features from Instagram, TikTok, YouTube, Facebook, and X for video posting and sharing",
   "architectural_notes": [
     "Multi-platform video hosting combining Instagram/TikTok/YouTube/Facebook/X features",
@@ -9,12 +9,15 @@
     "SkelMsg messaging system requires polling mechanism for message updates (real-time WebSocket alternative)",
     "Video link sharing in SkelMsg allows users to share SkelUlt video URLs in conversations",
     "SkelMsg is an integrated feature within SkelUlt, not a separate application",
-    "Vidles feature requires separate upload flow with aspect ratio (9:16) and duration validation (5s-150s)"
+    "Vidles feature requires separate upload flow with aspect ratio (9:16) and duration validation (5s-150s)",
+    "Enable/Disable button uses existing follow system backend but provides clearer UI pattern next to engagement buttons",
+    "SkelUlt logo image asset needs to be accessible in both light and dark theme contexts"
   ],
   "known_issues": [
     "White screen issue after Version 5 deployment - site not rendering content properly"
   ],
   "isFixRequest": true,
+  "imageRequirements": "## Required Images\n- SkelUlt logo with bold geometric text featuring dark gray 'SKEL' letters and cyan 'ULT' accent on transparent background, optimized for header display (skelult-logo.dim_200x60.png)",
   "existing_features": [
     {
       "id": "feature-implement-user-authentication-system-using-internet-identity-to-allow-users-to-sign-up-log-in-and-manage-their-accounts",
@@ -271,6 +274,38 @@
         "REQ-39"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-the-skelult-logo-bold-geometric-text-with-cyan-ult-accent-to-the-top-left-corner-of-the-layout-component-header-ensuring-it-is-small-in-size-and-displays-consistently-in-both-light-and-dark-modes",
+      "title": "Add the SkelUlt logo (bold geometric text with cyan 'ULT' accent) to the top-left corner of the Layout component header, ensuring it is small in size and displays consistently in both light and dark modes",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-enable-button-next-to-the-like-button-on-all-videos-in-videocard-component-that-allows-users-to-follow-subscribe-to-the-video-creator-s-channel",
+      "title": "Add an Enable button next to the like button on all videos in VideoCard component that allows users to follow/subscribe to the video creator's channel",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-smooth-animation-for-the-enable-disable-button-that-transforms-the-button-state-from-enable-to-disable-on-click-with-visual-transition-effects",
+      "title": "Implement smooth animation for the Enable/Disable button that transforms the button state from 'Enable' to 'Disable' on click with visual transition effects",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-disable-button-functionality-that-allows-users-to-unfollow-unsubscribe-from-the-video-creator-s-channel-when-clicked-in-the-disable-state",
+      "title": "Implement Disable button functionality that allows users to unfollow/unsubscribe from the video creator's channel when clicked in the Disable state",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -370,6 +405,18 @@
       "reqIds": [
         "REQ-26"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Add SkelUlt logo to top-left corner of Layout header, small and consistent in light and dark modes",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Add Enable/Disable button next to like button on videos that works as follow/subscribe with smooth animation between states",
+      "reqIds": [],
       "status": "pending"
     }
   ],
