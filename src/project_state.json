@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
+  "projectStateVersion": 9,
   "summary": "SkelUlt: A unified social media video platform combining features from Instagram, TikTok, YouTube, Facebook, and X for video posting and sharing",
   "architectural_notes": [
     "Multi-platform video hosting combining Instagram/TikTok/YouTube/Facebook/X features",
@@ -10,8 +10,10 @@
     "Video link sharing in SkelMsg allows users to share SkelUlt video URLs in conversations",
     "SkelMsg is an integrated feature within SkelUlt, not a separate application"
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Video deletion button (trash icon) is not appearing on user's own videos"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-implement-user-authentication-system-using-internet-identity-to-allow-users-to-sign-up-log-in-and-manage-their-accounts",
@@ -138,6 +140,30 @@
       "title": "Implement automatic message polling that checks for new messages every 3 seconds using React Query's refetchInterval to simulate real-time updates",
       "reqIds": [
         "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-trash-icon-delete-button-to-the-videocard-component-that-appears-only-when-the-authenticated-user-is-the-video-creator-positioned-prominently-near-other-action-buttons-like-comment-share",
+      "title": "Add a trash icon delete button to the VideoCard component that appears only when the authenticated user is the video creator, positioned prominently near other action buttons (like, comment, share)",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-delete-video-functionality-that-shows-a-confirmation-dialog-when-the-trash-icon-is-clicked-then-calls-the-backend-deletevideo-mutation-and-updates-the-ui-optimistically",
+      "title": "Implement delete video functionality that shows a confirmation dialog when the trash icon is clicked, then calls the backend deleteVideo mutation and updates the UI optimistically",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-the-same-trash-icon-delete-button-to-the-videogrid-component-thumbnails-that-appears-only-for-the-authenticated-user-s-own-videos",
+      "title": "Add the same trash icon delete button to the VideoGrid component thumbnails that appears only for the authenticated user's own videos",
+      "reqIds": [
+        "REQ-23"
       ],
       "version": 1
     }

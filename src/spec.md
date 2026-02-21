@@ -1,15 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add SkelMsg real-time messaging feature to SkelUlt for sharing video links between users.
+**Goal:** Add delete functionality with trash icon for user's own videos.
 
 **Planned changes:**
-- Add SkelMsg navigation option in the main header alongside existing navigation items
-- Implement backend message storage with sender, recipient, content, optional video link, and timestamp
-- Create conversation list view showing all message threads with preview and timestamps
-- Build chat thread view displaying full message history between users in WhatsApp-style layout
-- Add message input component with text field, send button, and video link attachment capability
-- Implement automatic message polling every 3 seconds using React Query's refetchInterval
-- Add backend query function to retrieve all conversation partners for a user
+- Add trash icon delete button to VideoCard component visible only for authenticated user's own videos
+- Implement delete video functionality with confirmation dialog and optimistic UI updates
+- Add trash icon delete button to VideoGrid thumbnails for user's own videos
 
-**User-visible outcome:** Users can access SkelMsg from the main navigation to send and receive text messages with video links to other SkelUlt users, view conversation lists, and see message threads that update automatically every 3 seconds in a WhatsApp-like interface.
+**User-visible outcome:** Users can delete their own videos by clicking a trash icon button, which shows a confirmation dialog before removing the video from the feed.

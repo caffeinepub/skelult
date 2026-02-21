@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { UserProfile, Video, Comment, VideoId, UserId, Message } from '../backend';
 import type { Principal } from '@dfinity/principal';
+import { toast } from 'sonner';
 
 // User Profile Queries
 export function useGetCallerUserProfile() {
@@ -103,6 +104,57 @@ export function useUploadVideo() {
       return actor.uploadVideo(params.title, params.description, params.tags, params.videoFile);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['videos'] });
+      queryClient.invalidateQueries({ queryKey: ['userVideos'] });
+    },
+  });
+}
+
+export function useDeleteVideo() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (videoId: VideoId) => {
+      if (!actor) throw new Error('Actor not available');
+      // @ts-ignore - deleteVideo method will be added to backend
+      return actor.deleteVideo(videoId);
+    },
+    onMutate: async (videoId) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['videos'] });
+      await queryClient.cancelQueries({ queryKey: ['userVideos'] });
+
+      // Snapshot previous values
+      const previousMostLiked = queryClient.getQueryData<Video[]>(['videos', 'mostLiked']);
+      
+      // Optimistically update most liked videos
+      queryClient.setQueryData<Video[]>(['videos', 'mostLiked'], (old) => {
+        if (!old) return [];
+        return old.filter(v => v.id !== videoId);
+      });
+
+      // Optimistically update user videos for all cached user video queries
+      queryClient.setQueriesData<Video[]>(
+        { queryKey: ['userVideos'] },
+        (old) => {
+          if (!old) return [];
+          return old.filter(v => v.id !== videoId);
+        }
+      );
+
+      return { previousMostLiked };
+    },
+    onError: (error, videoId, context) => {
+      // Revert optimistic updates on error
+      if (context?.previousMostLiked) {
+        queryClient.setQueryData(['videos', 'mostLiked'], context.previousMostLiked);
+      }
+      toast.error('Failed to delete video. Please try again.');
+      console.error('Delete video error:', error);
+    },
+    onSuccess: () => {
+      toast.success('Video deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['videos'] });
       queryClient.invalidateQueries({ queryKey: ['userVideos'] });
     },

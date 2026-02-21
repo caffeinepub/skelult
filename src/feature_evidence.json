@@ -2,12 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-skelmsg-navigation-option-in-the-main-layout-component-header-that-opens-a-messaging-interface-positioned-alongside-existing-navigation-items-home-upload-profile",
-      "featureTitle": "Create a SkelMsg navigation option in the main Layout component header that opens a messaging interface, positioned alongside existing navigation items (home, upload, profile)",
+      "featureId": "feature-add-a-trash-icon-delete-button-to-the-videocard-component-that-appears-only-when-the-authenticated-user-is-the-video-creator-positioned-prominently-near-other-action-buttons-like-comment-share",
+      "featureTitle": "Add a trash icon delete button to the VideoCard component that appears only when the authenticated user is the video creator, positioned prominently near other action buttons (like, comment, share)",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/pages/MessagingPage.tsx"
+        "frontend/src/components/VideoCard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -19,15 +17,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-14"
+        "REQ-21"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-create-a-conversation-list-view-showing-all-users-the-authenticated-user-has-exchanged-messages-with-displaying-the-most-recent-message-preview-and-timestamp-for-each-conversation",
-      "featureTitle": "Create a conversation list view showing all users the authenticated user has exchanged messages with, displaying the most recent message preview and timestamp for each conversation",
+      "featureId": "feature-implement-delete-video-functionality-that-shows-a-confirmation-dialog-when-the-trash-icon-is-clicked-then-calls-the-backend-deletevideo-mutation-and-updates-the-ui-optimistically",
+      "featureTitle": "Implement delete video functionality that shows a confirmation dialog when the trash icon is clicked, then calls the backend deleteVideo mutation and updates the UI optimistically",
       "files": [
-        "frontend/src/components/ConversationList.tsx",
+        "frontend/src/components/VideoCard.tsx",
         "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
@@ -40,16 +38,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-16"
+        "REQ-22"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-a-chat-thread-view-that-displays-the-full-message-history-between-the-authenticated-user-and-a-selected-conversation-partner-with-messages-grouped-by-sender-and-displaying-timestamps",
-      "featureTitle": "Implement a chat thread view that displays the full message history between the authenticated user and a selected conversation partner, with messages grouped by sender and displaying timestamps",
+      "featureId": "feature-add-the-same-trash-icon-delete-button-to-the-videogrid-component-thumbnails-that-appears-only-for-the-authenticated-user-s-own-videos",
+      "featureTitle": "Add the same trash icon delete button to the VideoGrid component thumbnails that appears only for the authenticated user's own videos",
       "files": [
-        "frontend/src/components/ChatThread.tsx",
-        "frontend/src/components/MessageBubble.tsx"
+        "frontend/src/components/VideoGrid.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -61,50 +58,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-17"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-a-message-input-component-with-a-text-field-and-send-button-plus-a-button-to-attach-share-skelult-video-links-from-the-user-s-feed",
-      "featureTitle": "Create a message input component with a text field and send button, plus a button to attach/share SkelUlt video links from the user's feed",
-      "files": [
-        "frontend/src/components/MessageInput.tsx",
-        "frontend/src/components/VideoLinkPicker.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-18"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-automatic-message-polling-that-checks-for-new-messages-every-3-seconds-using-react-query-s-refetchinterval-to-simulate-real-time-updates",
-      "featureTitle": "Implement automatic message polling that checks for new messages every 3 seconds using React Query's refetchInterval to simulate real-time updates",
-      "files": [
-        "frontend/src/components/ChatThread.tsx",
-        "frontend/src/components/ConversationList.tsx",
-        "frontend/src/hooks/useQueries.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-19"
+        "REQ-23"
       ],
       "confidence": "high"
     }
