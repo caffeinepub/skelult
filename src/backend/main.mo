@@ -5,10 +5,13 @@ import Time "mo:core/Time";
 import Order "mo:core/Order";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
+import Nat "mo:core/Nat";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
+
+
 
 actor {
   // Mix in Storage for file handling
@@ -31,7 +34,18 @@ actor {
     following : Nat;
   };
 
-  type Video = {
+  // Video Content Type
+  public type ContentType = {
+    #video;
+    #vidle;
+  };
+
+  // Constants for validation
+  let MIN_VIDLE_DURATION_SECONDS = 5;
+  let MAX_VIDLE_DURATION_SECONDS = 150; // 2 minutes 30 seconds in seconds
+  let VIDLE_ASPECT_RATIO = 0.5625; // 9:16 aspect ratio as decimal
+
+  public type Video = {
     id : VideoId;
     uploader : UserId;
     title : Text;
@@ -40,6 +54,9 @@ actor {
     videoFile : Storage.ExternalBlob;
     likes : Nat;
     uploadTime : Time.Time;
+    contentType : ContentType;
+    durationSeconds : Nat;
+    aspectRatio : Float;
   };
 
   type Comment = {
@@ -114,13 +131,30 @@ actor {
     profiles.add(caller, profile);
   };
 
-  // Upload Video
-  public shared ({ caller }) func uploadVideo(title : Text, description : Text, tags : [Text], videoFile : Storage.ExternalBlob) : async () {
+  // Upload Video with Validation for Vidles
+  public shared ({ caller }) func uploadVideo(
+    title : Text,
+    description : Text,
+    tags : [Text],
+    videoFile : Storage.ExternalBlob,
+    contentType : ContentType,
+    durationSeconds : Nat,
+    aspectRatio : Float,
+  ) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can upload videos");
     };
 
     ensureRegistered(caller);
+
+    // Validate Vidle specific requirements
+    switch (contentType) {
+      case (#vidle) {
+        validateVidleDuration(durationSeconds);
+        validateVidleAspectRatio(aspectRatio);
+      };
+      case (_) {};
+    };
 
     let video : Video = {
       id = nextVideoId;
@@ -131,10 +165,30 @@ actor {
       videoFile;
       likes = 0;
       uploadTime = Time.now();
+      contentType;
+      durationSeconds;
+      aspectRatio;
     };
 
     videos.add(nextVideoId, video);
     nextVideoId += 1;
+  };
+
+  // Function to validate Vidle duration
+  func validateVidleDuration(durationSeconds : Nat) {
+    if (durationSeconds < MIN_VIDLE_DURATION_SECONDS) {
+      Runtime.trap("Vidle duration must be at least 5 seconds");
+    } else if (durationSeconds > MAX_VIDLE_DURATION_SECONDS) {
+      Runtime.trap("Vidle duration cannot exceed 2 minutes 30 seconds");
+    };
+  };
+
+  // Function to validate Vidle aspect ratio
+  func validateVidleAspectRatio(aspectRatio : Float) {
+    let tolerance : Float = 0.025; // Allow small tolerance for aspect ratio validation
+    if (aspectRatio < VIDLE_ASPECT_RATIO - tolerance or aspectRatio > VIDLE_ASPECT_RATIO + tolerance) {
+      Runtime.trap("Vidle must have a 9:16 vertical aspect ratio");
+    };
   };
 
   // Get Video by ID - Public query, anyone can view

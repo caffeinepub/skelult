@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
+  "projectStateVersion": 13,
   "summary": "SkelUlt: A unified social media video platform combining features from Instagram, TikTok, YouTube, Facebook, and X for video posting and sharing",
   "architectural_notes": [
     "Multi-platform video hosting combining Instagram/TikTok/YouTube/Facebook/X features",
@@ -8,10 +8,11 @@
     "Social networking capabilities needed for user interactions",
     "SkelMsg messaging system requires polling mechanism for message updates (real-time WebSocket alternative)",
     "Video link sharing in SkelMsg allows users to share SkelUlt video URLs in conversations",
-    "SkelMsg is an integrated feature within SkelUlt, not a separate application"
+    "SkelMsg is an integrated feature within SkelUlt, not a separate application",
+    "Vidles feature requires separate upload flow with aspect ratio (9:16) and duration validation (5s-150s)"
   ],
   "known_issues": [
-    "Video deletion button (trash icon) is not appearing on user's own videos"
+    "White screen issue after Version 5 deployment - site not rendering content properly"
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -166,6 +167,110 @@
         "REQ-23"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-videouploadmodal-component-to-include-a-radio-button-or-toggle-option-that-allows-users-to-select-whether-they-are-uploading-a-regular-video-or-a-vidle-short-form-vertical-video",
+      "title": "Update the VideoUploadModal component to include a radio button or toggle option that allows users to select whether they are uploading a regular 'Video' or a 'Vidle' (short-form vertical video)",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-client-side-validation-in-the-videouploadmodal-that-checks-the-selected-video-file-s-duration-and-aspect-ratio-when-vidle-is-selected-displaying-clear-error-messages-if-the-file-does-not-meet-the-requirements-5-seconds-to-2-30-minutes-duration-9-16-aspect-ratio",
+      "title": "Add client-side validation in the VideoUploadModal that checks the selected video file's duration and aspect ratio when 'Vidle' is selected, displaying clear error messages if the file does not meet the requirements (5 seconds to 2:30 minutes duration, 9:16 aspect ratio)",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-visual-badge-or-label-to-videocard-and-videogrid-components-that-displays-vidle-for-short-form-content-to-distinguish-it-from-regular-videos-in-the-feed-and-profile-pages",
+      "title": "Add a visual badge or label to VideoCard and VideoGrid components that displays 'Vidle' for short-form content to distinguish it from regular videos in the feed and profile pages",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-dedicated-vidles-navigation-option-in-the-layout-component-header-that-filters-and-displays-only-short-form-vertical-videos-vidles-positioned-alongside-existing-navigation-items",
+      "title": "Add a dedicated 'Vidles' navigation option in the Layout component header that filters and displays only short-form vertical videos (Vidles), positioned alongside existing navigation items",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-vidlespage-component-that-displays-a-vertical-scrollable-feed-of-only-vidles-short-form-videos-optimized-for-viewing-vertical-9-16-content-with-swipe-or-scroll-navigation-similar-to-youtube-shorts",
+      "title": "Create a VidlesPage component that displays a vertical scrollable feed of only Vidles (short-form videos), optimized for viewing vertical 9:16 content with swipe or scroll navigation similar to YouTube Shorts",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-comprehensive-react-error-boundaries-to-catch-and-display-rendering-errors-in-app-tsx-wrapping-the-router-component-to-prevent-white-screens-from-javascript-errors",
+      "title": "Add comprehensive React error boundaries to catch and display rendering errors in App.tsx, wrapping the Router component to prevent white screens from JavaScript errors",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-try-catch-blocks-and-null-safety-checks-to-all-react-query-hooks-in-usequeries-ts-to-handle-backend-connection-failures-gracefully",
+      "title": "Add try-catch blocks and null safety checks to all React Query hooks in useQueries.ts to handle backend connection failures gracefully",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-fallback-loading-states-and-null-checks-to-feedpage-tsx-vidlespage-tsx-profilepage-tsx-videodetailpage-tsx-and-messagingpage-tsx-to-prevent-rendering-failures-when-data-is-unavailable",
+      "title": "Add fallback loading states and null checks to FeedPage.tsx, VidlesPage.tsx, ProfilePage.tsx, VideoDetailPage.tsx, and MessagingPage.tsx to prevent rendering failures when data is unavailable",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-verify-and-fix-the-router-configuration-in-app-tsx-to-ensure-all-routes-vidles-profile-userid-video-videoid-messages-are-properly-defined-and-accessible",
+      "title": "Verify and fix the router configuration in App.tsx to ensure all routes (/, /vidles, /profile/:userId, /video/:videoId, /messages) are properly defined and accessible",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-defensive-checks-in-useinternetidentity-ts-and-useactor-ts-to-handle-authentication-initialization-failures-and-prevent-crashes-when-internet-identity-is-unavailable",
+      "title": "Add defensive checks in useInternetIdentity.ts and useActor.ts to handle authentication initialization failures and prevent crashes when Internet Identity is unavailable",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-safe-fallbacks-and-validation-to-videocard-tsx-videogrid-tsx-and-all-video-related-components-to-handle-missing-video-data-properties-url-title-uploader-without-crashing",
+      "title": "Add safe fallbacks and validation to VideoCard.tsx, VideoGrid.tsx, and all video-related components to handle missing video data properties (url, title, uploader) without crashing",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-review-and-fix-any-import-errors-missing-dependencies-or-module-resolution-issues-in-all-frontend-files-that-could-prevent-the-application-bundle-from-loading-correctly",
+      "title": "Review and fix any import errors, missing dependencies, or module resolution issues in all frontend files that could prevent the application bundle from loading correctly",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-console-logging-at-critical-initialization-points-main-tsx-app-tsx-route-components-to-help-diagnose-where-the-application-fails-to-render-if-white-screen-persists-after-fixes",
+      "title": "Add console logging at critical initialization points (main.tsx, App.tsx, route components) to help diagnose where the application fails to render if white screen persists after fixes",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -234,6 +339,36 @@
       "summary": "Add backend query function to retrieve all unique conversation partners for a given user Principal, returning an array of user Principals that have exchanged messages with the authenticated user",
       "reqIds": [
         "REQ-20"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Add Vidles (short-form vertical videos) feature with 9:16 aspect ratio, duration between 5 seconds and 2:30 minutes, similar to YouTube Shorts",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Add a 'contentType' field to the Video data model in backend/main.mo that can be either 'video' or 'vidle' to distinguish between regular videos and Vidles (short-form content)",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Add validation in the backend uploadVideo function to enforce that Vidles must have a duration between 5 seconds (minimum) and 2 minutes 30 seconds (maximum)",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Add validation in the backend uploadVideo function to enforce that Vidles must have a 9:16 aspect ratio (vertical format)",
+      "reqIds": [
+        "REQ-26"
       ],
       "status": "pending"
     }

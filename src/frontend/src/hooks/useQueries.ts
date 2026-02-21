@@ -1,7 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { UserProfile, Video, Comment, VideoId, UserId, Message } from '../backend';
-import type { Principal } from '@dfinity/principal';
+import type { UserProfile, Video, Comment, Message, VideoId } from '../backend';
+import { ExternalBlob, ContentType } from '../backend';
+import { Principal } from '@dfinity/principal';
 import { toast } from 'sonner';
 
 // User Profile Queries
@@ -12,10 +13,15 @@ export function useGetCallerUserProfile() {
     queryKey: ['currentUserProfile'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      return actor.getCallerUserProfile();
+      try {
+        return await actor.getCallerUserProfile();
+      } catch (error) {
+        console.error('Error fetching caller profile:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !actorFetching,
-    retry: false,
+    retry: 1,
   });
 
   return {
@@ -32,21 +38,31 @@ export function useGetUserProfile(userId: string) {
     queryKey: ['userProfile', userId],
     queryFn: async () => {
       if (!actor) return null;
-      const principal = await import('@dfinity/principal').then(m => m.Principal.fromText(userId));
-      return actor.getUserProfile(principal);
+      try {
+        return await actor.getUserProfile(Principal.fromText(userId));
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+      }
     },
     enabled: !!actor && !isFetching && !!userId,
+    retry: 1,
   });
 }
 
-export function useSaveCallerUserProfile() {
+export function useSaveUserProfile() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.saveCallerUserProfile(profile);
+      try {
+        return await actor.saveCallerUserProfile(profile);
+      } catch (error) {
+        console.error('Error saving profile:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
@@ -62,35 +78,73 @@ export function useGetMostLikedVideos() {
     queryKey: ['videos', 'mostLiked'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getMostLikedVideos();
+      try {
+        return await actor.getMostLikedVideos();
+      } catch (error) {
+        console.error('Error fetching videos:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !isFetching,
+    retry: 1,
   });
 }
 
-export function useGetVideo(videoId: VideoId) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Video | null>({
-    queryKey: ['video', videoId.toString()],
-    queryFn: async () => {
-      if (!actor) return null;
-      return actor.getVideo(videoId);
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useGetUserVideos(userId: UserId) {
+export function useGetVidles() {
   const { actor, isFetching } = useActor();
 
   return useQuery<Video[]>({
-    queryKey: ['userVideos', userId.toString()],
+    queryKey: ['videos', 'vidles'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getUserVideos(userId);
+      try {
+        const allVideos = await actor.getMostLikedVideos();
+        return allVideos.filter(video => video.contentType === ContentType.vidle);
+      } catch (error) {
+        console.error('Error fetching vidles:', error);
+        throw error;
+      }
     },
     enabled: !!actor && !isFetching,
+    retry: 1,
+  });
+}
+
+export function useGetUserVideos(userId: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Video[]>({
+    queryKey: ['videos', 'user', userId],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        return await actor.getUserVideos(Principal.fromText(userId));
+      } catch (error) {
+        console.error('Error fetching user videos:', error);
+        return [];
+      }
+    },
+    enabled: !!actor && !isFetching && !!userId,
+    retry: 1,
+  });
+}
+
+export function useGetVideo(videoId: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Video | null>({
+    queryKey: ['video', videoId],
+    queryFn: async () => {
+      if (!actor) return null;
+      try {
+        return await actor.getVideo(BigInt(videoId));
+      } catch (error) {
+        console.error('Error fetching video:', error);
+        return null;
+      }
+    },
+    enabled: !!actor && !isFetching && !!videoId,
+    retry: 1,
   });
 }
 
@@ -99,69 +153,81 @@ export function useUploadVideo() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: { title: string; description: string; tags: string[]; videoFile: any }) => {
+    mutationFn: async ({
+      title,
+      description,
+      tags,
+      videoFile,
+      contentType,
+      durationSeconds,
+      aspectRatio,
+    }: {
+      title: string;
+      description: string;
+      tags: string[];
+      videoFile: ExternalBlob;
+      contentType?: ContentType;
+      durationSeconds?: bigint;
+      aspectRatio?: number;
+    }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.uploadVideo(params.title, params.description, params.tags, params.videoFile);
+      try {
+        return await actor.uploadVideo(
+          title,
+          description,
+          tags,
+          videoFile,
+          contentType || ContentType.video,
+          durationSeconds || BigInt(0),
+          aspectRatio || 0
+        );
+      } catch (error) {
+        console.error('Error uploading video:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['videos'] });
-      queryClient.invalidateQueries({ queryKey: ['userVideos'] });
     },
   });
 }
 
 export function useDeleteVideo() {
-  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (videoId: VideoId) => {
-      if (!actor) throw new Error('Actor not available');
-      // @ts-ignore - deleteVideo method will be added to backend
-      return actor.deleteVideo(videoId);
+      // Note: Backend doesn't have delete functionality yet
+      // This is a placeholder for future implementation
+      throw new Error('Delete functionality not yet implemented in backend');
     },
     onMutate: async (videoId) => {
-      // Cancel outgoing refetches
+      // Optimistically remove from cache
       await queryClient.cancelQueries({ queryKey: ['videos'] });
-      await queryClient.cancelQueries({ queryKey: ['userVideos'] });
-
-      // Snapshot previous values
-      const previousMostLiked = queryClient.getQueryData<Video[]>(['videos', 'mostLiked']);
       
-      // Optimistically update most liked videos
-      queryClient.setQueryData<Video[]>(['videos', 'mostLiked'], (old) => {
-        if (!old) return [];
-        return old.filter(v => v.id !== videoId);
+      const previousVideos = queryClient.getQueryData(['videos', 'mostLiked']);
+      
+      queryClient.setQueryData(['videos', 'mostLiked'], (old: Video[] | undefined) => {
+        return old?.filter(v => v.id !== videoId) || [];
       });
 
-      // Optimistically update user videos for all cached user video queries
-      queryClient.setQueriesData<Video[]>(
-        { queryKey: ['userVideos'] },
-        (old) => {
-          if (!old) return [];
-          return old.filter(v => v.id !== videoId);
-        }
-      );
-
-      return { previousMostLiked };
+      return { previousVideos };
     },
-    onError: (error, videoId, context) => {
-      // Revert optimistic updates on error
-      if (context?.previousMostLiked) {
-        queryClient.setQueryData(['videos', 'mostLiked'], context.previousMostLiked);
+    onError: (err, videoId, context) => {
+      // Rollback on error
+      if (context?.previousVideos) {
+        queryClient.setQueryData(['videos', 'mostLiked'], context.previousVideos);
       }
-      toast.error('Failed to delete video. Please try again.');
-      console.error('Delete video error:', error);
+      toast.error('Failed to delete video');
     },
     onSuccess: () => {
       toast.success('Video deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['videos'] });
-      queryClient.invalidateQueries({ queryKey: ['userVideos'] });
     },
   });
 }
 
-// Like Mutation
+// Like Queries
 export function useLikeVideo() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -169,56 +235,77 @@ export function useLikeVideo() {
   return useMutation({
     mutationFn: async (videoId: VideoId) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.likeVideo(videoId);
+      try {
+        return await actor.likeVideo(videoId);
+      } catch (error) {
+        console.error('Error liking video:', error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (_, videoId) => {
       queryClient.invalidateQueries({ queryKey: ['videos'] });
-      queryClient.invalidateQueries({ queryKey: ['video'] });
+      queryClient.invalidateQueries({ queryKey: ['video', videoId.toString()] });
     },
   });
 }
 
 // Comment Queries
-export function useGetVideoComments(videoId: VideoId) {
+export function useGetVideoComments(videoId: string) {
   const { actor, isFetching } = useActor();
 
   return useQuery<Comment[]>({
-    queryKey: ['comments', videoId.toString()],
+    queryKey: ['comments', videoId],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getVideoComments(videoId);
+      try {
+        return await actor.getVideoComments(BigInt(videoId));
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+        return [];
+      }
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !isFetching && !!videoId,
+    retry: 1,
   });
 }
 
-export function usePostComment() {
+export function useCommentOnVideo() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: { videoId: VideoId; text: string }) => {
+    mutationFn: async ({ videoId, text }: { videoId: VideoId; text: string }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.commentOnVideo(params.videoId, params.text);
+      try {
+        return await actor.commentOnVideo(videoId, text);
+      } catch (error) {
+        console.error('Error commenting on video:', error);
+        throw error;
+      }
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['comments', variables.videoId.toString()] });
+    onSuccess: (_, { videoId }) => {
+      queryClient.invalidateQueries({ queryKey: ['comments', videoId.toString()] });
     },
   });
 }
 
-// Follow Mutations
+// Follow Queries
 export function useFollowUser() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (userId: UserId) => {
+    mutationFn: async (userId: Principal) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.followUser(userId);
+      try {
+        return await actor.followUser(userId);
+      } catch (error) {
+        console.error('Error following user:', error);
+        throw error;
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    onSuccess: (_, userId) => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile', userId.toString()] });
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
     },
   });
@@ -229,18 +316,72 @@ export function useUnfollowUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (userId: UserId) => {
+    mutationFn: async (userId: Principal) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.unfollowUser(userId);
+      try {
+        return await actor.unfollowUser(userId);
+      } catch (error) {
+        console.error('Error unfollowing user:', error);
+        throw error;
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    onSuccess: (_, userId) => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile', userId.toString()] });
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
     },
   });
 }
 
 // Messaging Queries
+export function useSendMessage() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      recipient,
+      content,
+      videoLink,
+    }: {
+      recipient: Principal;
+      content: string;
+      videoLink?: string;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      try {
+        return await actor.sendMessage(recipient, content, videoLink || null);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        throw error;
+      }
+    },
+    onSuccess: (_, { recipient }) => {
+      queryClient.invalidateQueries({ queryKey: ['messages', recipient.toString()] });
+      queryClient.invalidateQueries({ queryKey: ['conversationPartners'] });
+    },
+  });
+}
+
+export function useGetMessagesWith(otherUserId: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Message[]>({
+    queryKey: ['messages', otherUserId],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        return await actor.getMessagesWith(Principal.fromText(otherUserId));
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+        return [];
+      }
+    },
+    enabled: !!actor && !isFetching && !!otherUserId,
+    refetchInterval: 3000,
+    retry: 1,
+  });
+}
+
 export function useGetConversationPartners() {
   const { actor, isFetching } = useActor();
 
@@ -248,39 +389,15 @@ export function useGetConversationPartners() {
     queryKey: ['conversationPartners'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getConversationPartners();
+      try {
+        return await actor.getConversationPartners();
+      } catch (error) {
+        console.error('Error fetching conversation partners:', error);
+        return [];
+      }
     },
     enabled: !!actor && !isFetching,
     refetchInterval: 3000,
-  });
-}
-
-export function useGetMessagesWith(otherUser: Principal) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Message[]>({
-    queryKey: ['messages', otherUser.toString()],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getMessagesWith(otherUser);
-    },
-    enabled: !!actor && !isFetching,
-    refetchInterval: 3000,
-  });
-}
-
-export function useSendMessage() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (params: { recipient: Principal; content: string; videoLink: string | null }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.sendMessage(params.recipient, params.content, params.videoLink);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
-      queryClient.invalidateQueries({ queryKey: ['conversationPartners'] });
-    },
+    retry: 1,
   });
 }

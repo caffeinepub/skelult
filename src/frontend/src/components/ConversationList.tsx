@@ -66,7 +66,7 @@ interface ConversationItemProps {
 
 function ConversationItem({ partnerId, isSelected, onSelect }: ConversationItemProps) {
   const { data: profile } = useGetUserProfile(partnerId.toString());
-  const { data: messages } = useGetMessagesWith(partnerId);
+  const { data: messages } = useGetMessagesWith(partnerId.toString());
 
   const lastMessage = messages && messages.length > 0 ? messages[messages.length - 1] : null;
   const lastMessageTime = lastMessage ? new Date(Number(lastMessage.timestamp) / 1000000) : null;

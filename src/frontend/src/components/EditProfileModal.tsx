@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, Upload } from 'lucide-react';
-import { useSaveCallerUserProfile } from '../hooks/useQueries';
+import { useSaveUserProfile } from '../hooks/useQueries';
 import { toast } from 'sonner';
 import { ExternalBlob, type UserProfile } from '../backend';
 
@@ -23,7 +23,7 @@ export default function EditProfileModal({ open, onOpenChange, currentProfile }:
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(
     currentProfile.profilePicture?.getDirectURL()
   );
-  const saveProfile = useSaveCallerUserProfile();
+  const saveProfile = useSaveUserProfile();
 
   useEffect(() => {
     setUsername(currentProfile.username);
@@ -159,4 +159,3 @@ export default function EditProfileModal({ open, onOpenChange, currentProfile }:
     </Dialog>
   );
 }
-

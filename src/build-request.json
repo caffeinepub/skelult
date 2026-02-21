@@ -1,77 +1,179 @@
 {
   "kind": "build_request",
-  "title": "Add delete button with trash icon for user's own videos",
-  "priority": "normal",
+  "title": "Fix white screen issue preventing SkelUlt from loading after Version 5 deployment",
+  "projectName": "SkelUlt",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-21",
-      "text": "Add a trash icon delete button to the VideoCard component that appears only when the authenticated user is the video creator, positioned prominently near other action buttons (like, comment, share)",
+      "id": "REQ-32",
+      "text": "Add comprehensive React error boundaries to catch and display rendering errors in App.tsx, wrapping the Router component to prevent white screens from JavaScript errors",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-final"
+          "msg-latest"
         ],
         "quotes": [
-          "theres no trash icon"
+          "when i open the website, its just all white screen! please fix it right now"
         ]
       },
       "acceptanceCriteria": [
-        "Trash icon button is visible on VideoCard components for videos created by the authenticated user",
-        "Trash icon button is hidden on videos created by other users",
-        "Button is positioned consistently with other action buttons (like, comment, share)",
-        "Button uses an appropriate trash/delete icon from the existing icon library"
+        "Error boundary component is created that catches React rendering errors",
+        "Error boundary wraps the main Router component in App.tsx",
+        "When errors occur, a user-friendly error message is displayed instead of white screen",
+        "Error details are logged to console for debugging"
       ]
     },
     {
-      "id": "REQ-22",
-      "text": "Implement delete video functionality that shows a confirmation dialog when the trash icon is clicked, then calls the backend deleteVideo mutation and updates the UI optimistically",
+      "id": "REQ-33",
+      "text": "Add try-catch blocks and null safety checks to all React Query hooks in useQueries.ts to handle backend connection failures gracefully",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-final"
+          "msg-latest"
         ],
         "quotes": [
-          "theres no trash icon"
+          "check all the codings and if there's an error, fix it quickly"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking the trash icon triggers a confirmation dialog asking the user to confirm deletion",
-        "Confirming deletion calls the backend deleteVideo mutation with the video ID",
-        "Video is removed from the feed/grid immediately after successful deletion using optimistic updates",
-        "Error handling displays appropriate toast notifications if deletion fails",
-        "Cancel option in confirmation dialog prevents deletion"
+        "All useQuery and useMutation hooks have proper error handling",
+        "Null checks are added for actor instances before making backend calls",
+        "Failed queries display loading states or error messages instead of crashing",
+        "Network errors are caught and handled with user-friendly messages"
       ]
     },
     {
-      "id": "REQ-23",
-      "text": "Add the same trash icon delete button to the VideoGrid component thumbnails that appears only for the authenticated user's own videos",
+      "id": "REQ-34",
+      "text": "Add fallback loading states and null checks to FeedPage.tsx, VidlesPage.tsx, ProfilePage.tsx, VideoDetailPage.tsx, and MessagingPage.tsx to prevent rendering failures when data is unavailable",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-final"
+          "msg-latest"
         ],
         "quotes": [
-          "theres no trash icon"
+          "THE WEBSITE IS NOT WORKING",
+          "its just all white screen"
         ]
       },
       "acceptanceCriteria": [
-        "Trash icon button appears on video thumbnails in grid view for user's own videos",
-        "Button is positioned in a corner of the thumbnail (typically top-right) for easy access",
-        "Button triggers the same confirmation and deletion flow as in VideoCard",
-        "Button is hidden for videos created by other users"
+        "All page components handle undefined or null data gracefully",
+        "Loading skeletons or spinners are shown while data is being fetched",
+        "Empty states are displayed when no data is available",
+        "No page crashes due to missing or undefined props"
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "text": "Verify and fix the router configuration in App.tsx to ensure all routes (/, /vidles, /profile/:userId, /video/:videoId, /messages) are properly defined and accessible",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "check all the codings and if there's an error"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All routes are correctly configured with proper path patterns",
+        "Navigation between routes works without errors",
+        "404 or fallback route is defined for invalid paths",
+        "Route parameters are properly extracted and validated"
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "text": "Add defensive checks in useInternetIdentity.ts and useActor.ts to handle authentication initialization failures and prevent crashes when Internet Identity is unavailable",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "white screen",
+          "fix it quickly"
+        ]
+      },
+      "acceptanceCriteria": [
+        "AuthClient initialization errors are caught and handled gracefully",
+        "App continues to function in anonymous mode if authentication fails",
+        "User is shown a clear error message if Internet Identity is unavailable",
+        "No white screen occurs due to authentication initialization failures"
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "text": "Add safe fallbacks and validation to VideoCard.tsx, VideoGrid.tsx, and all video-related components to handle missing video data properties (url, title, uploader) without crashing",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "check all the codings and if there's an error, fix it quickly"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Components display placeholder content when video properties are missing",
+        "No console errors from undefined property access",
+        "Video player has fallback behavior for invalid video URLs",
+        "All optional properties are checked before rendering"
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "text": "Review and fix any import errors, missing dependencies, or module resolution issues in all frontend files that could prevent the application bundle from loading correctly",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "white screen issue",
+          "check all the codings"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All import statements resolve to valid modules",
+        "No circular dependencies exist in the codebase",
+        "All required npm packages are properly installed",
+        "TypeScript compilation completes without errors"
+      ]
+    },
+    {
+      "id": "REQ-39",
+      "text": "Add console logging at critical initialization points (main.tsx, App.tsx, route components) to help diagnose where the application fails to render if white screen persists after fixes",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "white screen",
+          "fix it quickly"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Console logs are added at app initialization in main.tsx",
+        "Each route component logs when it mounts",
+        "Provider initialization (QueryClient, InternetIdentity) is logged",
+        "Logs help identify where rendering stops in case of persistent issues"
       ]
     }
   ],
   "constraints": [
-    "Delete functionality must only work for videos created by the authenticated user",
-    "Use existing backend deleteVideo function; do not modify backend logic",
-    "Maintain consistency with existing neon-inspired UI design"
+    "Do not modify immutable frontend paths: useInternetIdentity.ts, useInternetIdentity.tsx, useActor.ts, main.tsx, frontend/src/components/ui",
+    "Maintain single-actor backend architecture in backend/main.mo",
+    "Preserve existing functionality while adding error handling",
+    "Do not change the application's core features or user-facing behavior",
+    "Keep all existing styling and visual design intact"
   ],
   "nonGoals": [
-    "Adding undo functionality after deletion",
-    "Implementing soft delete or trash/archive features",
-    "Adding bulk delete functionality",
-    "Modifying backend deleteVideo implementation"
+    "Updating the logo design (deferred until white screen is fixed)",
+    "Adding new features or functionality",
+    "Modifying backend Motoko code unless absolutely necessary",
+    "Changing the UI design or styling",
+    "Refactoring code that is already working correctly"
   ],
   "imageRequirements": {
     "required": [],

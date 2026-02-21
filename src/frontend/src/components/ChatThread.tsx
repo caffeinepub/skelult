@@ -14,7 +14,7 @@ interface ChatThreadProps {
 
 export default function ChatThread({ recipientId }: ChatThreadProps) {
   const { identity } = useInternetIdentity();
-  const { data: messages, isLoading } = useGetMessagesWith(recipientId);
+  const { data: messages, isLoading } = useGetMessagesWith(recipientId.toString());
   const { data: recipientProfile } = useGetUserProfile(recipientId.toString());
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(0);

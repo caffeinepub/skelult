@@ -1,94 +1,100 @@
-import { ReactNode } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { Home, User, Upload, Moon, Sun, MessageCircle } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
+import { Home, Upload, MessageSquare, User, Moon, Sun, Film } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import LoginButton from './LoginButton';
-import { Button } from '@/components/ui/button';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useState } from 'react';
 import VideoUploadModal from './VideoUploadModal';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-export default function Layout({ children }: LayoutProps) {
-  const { theme, setTheme } = useTheme();
-  const { identity } = useInternetIdentity();
+export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const { identity } = useInternetIdentity();
+  const routerState = useRouterState();
+  const currentPath = routerState.location.pathname;
+
   const isAuthenticated = !!identity;
 
-  const handleLogoClick = () => {
-    navigate({ to: '/' });
-  };
-
-  const handleProfileClick = () => {
-    if (identity) {
-      navigate({ to: '/profile/$userId', params: { userId: identity.getPrincipal().toString() } });
+  const handleUploadClick = () => {
+    if (!isAuthenticated) {
+      navigate({ to: '/' });
+      return;
     }
-  };
-
-  const handleMessagesClick = () => {
-    navigate({ to: '/messages' });
+    setUploadModalOpen(true);
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           {/* Logo */}
-          <button 
-            onClick={handleLogoClick}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          <div 
+            className="flex items-center gap-3 cursor-pointer group"
+            onClick={() => navigate({ to: '/' })}
           >
             <img 
               src="/assets/generated/skelult-logo.dim_256x256.png" 
-              alt="SkelUlt" 
-              className="h-10 w-10 rounded-xl"
+              alt="SkelUlt Logo" 
+              className="h-10 w-10 group-hover:scale-110 transition-transform"
             />
-            <span className="text-2xl font-bold text-gradient hidden sm:inline">
-              SkelUlt
-            </span>
-          </button>
+            <h1 className="text-2xl font-bold text-gradient">SkelUlt</h1>
+          </div>
 
           {/* Navigation */}
-          <nav className="flex items-center gap-2 sm:gap-4">
-            <Link to="/">
-              <Button variant="ghost" size="icon" className="rounded-full hover:neon-glow">
-                <Home className="h-5 w-5" />
-              </Button>
-            </Link>
+          <nav className="flex items-center gap-2">
+            <Button
+              variant={currentPath === '/' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => navigate({ to: '/' })}
+              className="rounded-full"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Button>
+
+            <Button
+              variant={currentPath === '/vidles' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => navigate({ to: '/vidles' })}
+              className="rounded-full"
+            >
+              <Film className="h-4 w-4 mr-2" />
+              Vidles
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleUploadClick}
+              className="rounded-full"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Upload
+            </Button>
 
             {isAuthenticated && (
               <>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-full hover:neon-glow-cyan"
-                  onClick={() => setUploadModalOpen(true)}
+                <Button
+                  variant={currentPath === '/messages' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => navigate({ to: '/messages' })}
+                  className="rounded-full"
                 >
-                  <Upload className="h-5 w-5" />
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Messages
                 </Button>
 
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-full hover:neon-glow-pink"
-                  onClick={handleMessagesClick}
-                  title="SkelMsg"
+                <Button
+                  variant={currentPath.startsWith('/profile') ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => navigate({ to: '/profile/$userId', params: { userId: identity.getPrincipal().toString() } })}
+                  className="rounded-full"
                 >
-                  <MessageCircle className="h-5 w-5" />
-                </Button>
-
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-full hover:neon-glow-green"
-                  onClick={handleProfileClick}
-                >
-                  <User className="h-5 w-5" />
+                  <User className="h-4 w-4 mr-2" />
+                  Profile
                 </Button>
               </>
             )}
@@ -96,10 +102,10 @@ export default function Layout({ children }: LayoutProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="rounded-full"
             >
-              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
 
             <LoginButton />
@@ -108,34 +114,29 @@ export default function Layout({ children }: LayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container px-4 py-6">
+      <main className="flex-1 container mx-auto px-4 py-8">
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 bg-card/50 backdrop-blur">
-        <div className="container px-4 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} SkelUlt. All rights reserved.</p>
-            <p>
-              Built with <span className="text-primary">♥</span> using{' '}
-              <a
-                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline font-medium"
-              >
-                caffeine.ai
-              </a>
-            </p>
-          </div>
+      <footer className="border-t border-border/40 bg-muted/30 py-6 mt-auto">
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+          <p>
+            © {new Date().getFullYear()} SkelUlt. Built with ❤️ using{' '}
+            <a
+              href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              caffeine.ai
+            </a>
+          </p>
         </div>
       </footer>
 
       {/* Upload Modal */}
-      {isAuthenticated && (
-        <VideoUploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
-      )}
+      <VideoUploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
     </div>
   );
 }

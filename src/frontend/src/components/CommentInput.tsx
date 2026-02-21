@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, Loader2 } from 'lucide-react';
-import { usePostComment } from '../hooks/useQueries';
+import { useCommentOnVideo } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { toast } from 'sonner';
 import type { VideoId } from '../backend';
@@ -14,7 +14,7 @@ interface CommentInputProps {
 export default function CommentInput({ videoId }: CommentInputProps) {
   const { identity } = useInternetIdentity();
   const [comment, setComment] = useState('');
-  const postComment = usePostComment();
+  const postComment = useCommentOnVideo();
   const isAuthenticated = !!identity;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,4 +79,3 @@ export default function CommentInput({ videoId }: CommentInputProps) {
     </form>
   );
 }
-

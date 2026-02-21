@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
-import { useSaveCallerUserProfile } from '../hooks/useQueries';
+import { useSaveUserProfile } from '../hooks/useQueries';
 import { toast } from 'sonner';
 
 interface ProfileSetupModalProps {
@@ -15,13 +15,13 @@ interface ProfileSetupModalProps {
 export default function ProfileSetupModal({ open }: ProfileSetupModalProps) {
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
-  const saveProfile = useSaveCallerUserProfile();
+  const saveProfile = useSaveUserProfile();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!username.trim()) {
-      toast.error('Please enter a username');
+      toast.error('Username is required');
       return;
     }
 
@@ -41,26 +41,29 @@ export default function ProfileSetupModal({ open }: ProfileSetupModalProps) {
   };
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-md" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gradient">Welcome to SkelUlt!</DialogTitle>
-          <DialogDescription>
-            Let's set up your profile to get started
-          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <p className="text-sm text-muted-foreground">
+            Let's set up your profile to get started
+          </p>
+
           <div className="space-y-2">
             <Label htmlFor="username">Username *</Label>
             <Input
               id="username"
-              placeholder="Enter your username"
+              placeholder="Choose a username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               disabled={saveProfile.isPending}
               className="rounded-xl"
+              autoFocus
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="bio">Bio</Label>
             <Textarea
@@ -72,6 +75,7 @@ export default function ProfileSetupModal({ open }: ProfileSetupModalProps) {
               className="rounded-xl min-h-[100px]"
             />
           </div>
+
           <Button
             type="submit"
             disabled={saveProfile.isPending || !username.trim()}
@@ -91,4 +95,3 @@ export default function ProfileSetupModal({ open }: ProfileSetupModalProps) {
     </Dialog>
   );
 }
-

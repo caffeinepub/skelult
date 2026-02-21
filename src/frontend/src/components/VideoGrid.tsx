@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Play, Trash2 } from 'lucide-react';
 import {
@@ -12,9 +12,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import type { Video } from '../backend';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { Video, ContentType } from '../backend';
 import { useDeleteVideo } from '../hooks/useQueries';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 
 interface VideoGridProps {
   videos: Video[];
@@ -22,96 +22,107 @@ interface VideoGridProps {
 
 export default function VideoGrid({ videos }: VideoGridProps) {
   const navigate = useNavigate();
-  const { identity } = useInternetIdentity();
-  const deleteVideo = useDeleteVideo();
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [videoToDelete, setVideoToDelete] = useState<Video | null>(null);
 
-  const handleDeleteClick = (e: React.MouseEvent, video: Video) => {
-    e.stopPropagation();
-    setVideoToDelete(video);
-    setShowDeleteDialog(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (videoToDelete) {
-      deleteVideo.mutate(videoToDelete.id);
-    }
-    setShowDeleteDialog(false);
-    setVideoToDelete(null);
-  };
-
-  const isOwnVideo = (video: Video) => {
-    return identity && video.uploader.toString() === identity.getPrincipal().toString();
-  };
-
-  if (videos.length === 0) {
+  if (!videos || videos.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        <p className="text-lg">No videos yet</p>
+        <p>No videos uploaded yet</p>
       </div>
     );
   }
 
   return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {videos.map((video) => (
+        <VideoGridItem key={video.id.toString()} video={video} />
+      ))}
+    </div>
+  );
+}
+
+function VideoGridItem({ video }: { video: Video }) {
+  const navigate = useNavigate();
+  const { identity } = useInternetIdentity();
+  const deleteVideo = useDeleteVideo();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const isOwnVideo = identity && video.uploader.toString() === identity.getPrincipal().toString();
+  const isVidle = video.contentType === ContentType.vidle;
+  const thumbnailUrl = video.videoFile?.getDirectURL() || '/assets/generated/video-placeholder.dim_1920x1080.png';
+
+  const handleClick = () => {
+    navigate({ to: '/video/$videoId', params: { videoId: video.id.toString() } });
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteVideo.mutate(video.id);
+    setShowDeleteDialog(false);
+  };
+
+  return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {videos.map((video) => (
-          <div
-            key={video.id.toString()}
-            onClick={() => navigate({ to: '/video/$videoId', params: { videoId: video.id.toString() } })}
-            className="group relative aspect-video rounded-2xl overflow-hidden cursor-pointer border-2 border-border/50 hover:border-primary/50 transition-all hover:shadow-neon"
-          >
-            <video
-              src={video.videoFile.getDirectURL()}
-              poster="/assets/generated/video-placeholder.dim_1920x1080.png"
-              className="w-full h-full object-cover"
-            />
-            
-            {/* Delete Button */}
-            {isOwnVideo(video) && (
-              <button
-                onClick={(e) => handleDeleteClick(e, video)}
-                disabled={deleteVideo.isPending}
-                className="absolute top-3 right-3 z-10 bg-black/70 hover:bg-destructive/90 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                title="Delete video"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            )}
+      <div
+        className="group relative aspect-video bg-muted rounded-2xl overflow-hidden cursor-pointer border-2 border-border/50 hover:border-primary/50 transition-all hover:shadow-neon"
+        onClick={handleClick}
+      >
+        {/* Thumbnail */}
+        <video
+          src={thumbnailUrl}
+          poster="/assets/generated/video-placeholder.dim_1920x1080.png"
+          className="w-full h-full object-cover"
+        />
 
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-primary/90 rounded-full p-4 neon-glow">
-                  <Play className="h-8 w-8 text-white fill-white" />
-                </div>
-              </div>
-            </div>
-
-            {/* Title */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
-              <h3 className="font-bold text-white line-clamp-2 mb-2">{video.title}</h3>
-              <div className="flex items-center gap-2 text-white/80 text-sm">
-                <Badge variant="secondary" className="rounded-full text-xs">
-                  {Number(video.likes)} likes
-                </Badge>
-              </div>
-            </div>
+        {/* Vidle Badge */}
+        {isVidle && (
+          <div className="absolute top-2 left-2 z-10">
+            <Badge className="bg-accent text-accent-foreground font-bold uppercase text-xs px-2 py-1 rounded-full">
+              VIDLE
+            </Badge>
           </div>
-        ))}
+        )}
+
+        {/* Delete Button */}
+        {isOwnVideo && (
+          <button
+            onClick={handleDeleteClick}
+            disabled={deleteVideo.isPending}
+            className="absolute top-2 right-2 z-10 bg-destructive/90 hover:bg-destructive text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+            title="Delete video"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
+
+        {/* Play Overlay */}
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <div className="bg-primary rounded-full p-4">
+            <Play className="h-8 w-8 text-primary-foreground fill-current" />
+          </div>
+        </div>
+
+        {/* Title Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+          <h3 className="text-white font-semibold line-clamp-2 text-sm">
+            {video.title || 'Untitled Video'}
+          </h3>
+        </div>
       </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Video</AlertDialogTitle>
+            <AlertDialogTitle>Delete {isVidle ? 'Vidle' : 'Video'}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this video? This action cannot be undone.
+              Are you sure you want to delete this {isVidle ? 'vidle' : 'video'}? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setVideoToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-destructive hover:bg-destructive/90"

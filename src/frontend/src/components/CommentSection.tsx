@@ -50,7 +50,7 @@ function CommentItem({ comment }: { comment: any }) {
 }
 
 export default function CommentSection({ videoId }: CommentSectionProps) {
-  const { data: comments, isLoading } = useGetVideoComments(videoId);
+  const { data: comments, isLoading } = useGetVideoComments(videoId.toString());
 
   if (isLoading) {
     return (
@@ -87,4 +87,3 @@ export default function CommentSection({ videoId }: CommentSectionProps) {
     </div>
   );
 }
-

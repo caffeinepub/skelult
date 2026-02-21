@@ -43,15 +43,22 @@ export const Message = IDL.Record({
   'videoLink' : IDL.Opt(IDL.Text),
   'timestamp' : Time,
 });
+export const ContentType = IDL.Variant({
+  'video' : IDL.Null,
+  'vidle' : IDL.Null,
+});
 export const Video = IDL.Record({
   'id' : VideoId,
   'title' : IDL.Text,
+  'contentType' : ContentType,
   'tags' : IDL.Vec(IDL.Text),
   'description' : IDL.Text,
   'videoFile' : ExternalBlob,
   'likes' : IDL.Nat,
+  'durationSeconds' : IDL.Nat,
   'uploader' : UserId,
   'uploadTime' : Time,
+  'aspectRatio' : IDL.Float64,
 });
 export const Comment = IDL.Record({
   'text' : IDL.Text,
@@ -110,7 +117,15 @@ export const idlService = IDL.Service({
   'sendMessage' : IDL.Func([UserId, IDL.Text, IDL.Opt(IDL.Text)], [], []),
   'unfollowUser' : IDL.Func([UserId], [], []),
   'uploadVideo' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), ExternalBlob],
+      [
+        IDL.Text,
+        IDL.Text,
+        IDL.Vec(IDL.Text),
+        ExternalBlob,
+        ContentType,
+        IDL.Nat,
+        IDL.Float64,
+      ],
       [],
       [],
     ),
@@ -154,15 +169,19 @@ export const idlFactory = ({ IDL }) => {
     'videoLink' : IDL.Opt(IDL.Text),
     'timestamp' : Time,
   });
+  const ContentType = IDL.Variant({ 'video' : IDL.Null, 'vidle' : IDL.Null });
   const Video = IDL.Record({
     'id' : VideoId,
     'title' : IDL.Text,
+    'contentType' : ContentType,
     'tags' : IDL.Vec(IDL.Text),
     'description' : IDL.Text,
     'videoFile' : ExternalBlob,
     'likes' : IDL.Nat,
+    'durationSeconds' : IDL.Nat,
     'uploader' : UserId,
     'uploadTime' : Time,
+    'aspectRatio' : IDL.Float64,
   });
   const Comment = IDL.Record({
     'text' : IDL.Text,
@@ -225,7 +244,15 @@ export const idlFactory = ({ IDL }) => {
     'sendMessage' : IDL.Func([UserId, IDL.Text, IDL.Opt(IDL.Text)], [], []),
     'unfollowUser' : IDL.Func([UserId], [], []),
     'uploadVideo' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), ExternalBlob],
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Vec(IDL.Text),
+          ExternalBlob,
+          ContentType,
+          IDL.Nat,
+          IDL.Float64,
+        ],
         [],
         [],
       ),

@@ -1,62 +1,246 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add delete button with trash icon for user's own videos",
+  "title": "Fix white screen issue preventing SkelUlt from loading after Version 5 deployment",
   "requirements": [
     {
-      "id": "REQ-21",
-      "summary": "Add trash icon delete button to VideoCard that appears only for authenticated user's own videos",
+      "id": "REQ-32",
+      "summary": "Add comprehensive React error boundaries to catch and display rendering errors in App.tsx, wrapping the Router component to prevent white screens from JavaScript errors",
       "acceptanceCriteria": [
-        "Trash icon button is visible on VideoCard components for videos created by the authenticated user",
-        "Trash icon button is hidden on videos created by other users",
-        "Button is positioned consistently with other action buttons (like, comment, share)",
-        "Button uses an appropriate trash/delete icon from the existing icon library"
+        "Error boundary component is created that catches React rendering errors",
+        "Error boundary wraps the main Router component in App.tsx",
+        "When errors occur, a user-friendly error message is displayed instead of white screen",
+        "Error details are logged to console for debugging"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/VideoCard.tsx",
+          "path": "frontend/src/components/ErrorBoundary.tsx",
+          "operation": "create",
+          "description": "Create a React error boundary component that catches rendering errors in child components. The component should maintain error state, log errors to console with stack traces, and display a user-friendly fallback UI with an error message and a 'Reload' button that refreshes the page. Include proper TypeScript typing for props (children: ReactNode) and state (hasError: boolean, error: Error | null)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Add a trash icon delete button to the action buttons row that appears only when the authenticated user's principal matches the video uploader principal. Position it alongside the existing LikeButton, CommentButton, and ShareButton. Use lucide-react's Trash2 icon to match the existing icon style. Include conditional rendering logic using useInternetIdentity hook to compare identity.getPrincipal() with video.uploader. Wire the button to trigger the delete confirmation handler defined in REQ-22."
+          "description": "Wrap the entire Router component tree with the ErrorBoundary component to catch any rendering errors that occur in route components or their children. Import ErrorBoundary from './components/ErrorBoundary' and place it as the outermost wrapper inside the ThemeProvider, ensuring all route-based rendering is protected. Verify the component's usage before implementing."
         }
       ]
     },
     {
-      "id": "REQ-22",
-      "summary": "Implement delete video functionality with confirmation dialog and optimistic UI updates",
+      "id": "REQ-33",
+      "summary": "Add try-catch blocks and null safety checks to all React Query hooks in useQueries.ts to handle backend connection failures gracefully",
       "acceptanceCriteria": [
-        "Clicking the trash icon triggers a confirmation dialog asking the user to confirm deletion",
-        "Confirming deletion calls the backend deleteVideo mutation with the video ID",
-        "Video is removed from the feed/grid immediately after successful deletion using optimistic updates",
-        "Error handling displays appropriate toast notifications if deletion fails",
-        "Cancel option in confirmation dialog prevents deletion"
+        "All useQuery and useMutation hooks have proper error handling",
+        "Null checks are added for actor instances before making backend calls",
+        "Failed queries display loading states or error messages instead of crashing",
+        "Network errors are caught and handled with user-friendly messages"
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a useDeleteVideo mutation hook that calls actor.deleteVideo(videoId) and implements optimistic updates by removing the video from relevant query caches (mostLikedVideos, userVideos). Use queryClient.setQueryData to update cached video lists immediately before the mutation completes. Include onError handler to revert optimistic updates and display error toast. Include onSuccess handler to show success toast and invalidate related queries."
-        },
-        {
-          "path": "frontend/src/components/VideoCard.tsx",
-          "operation": "modify",
-          "description": "Import and use the useDeleteVideo hook from REQ-22. Add state for managing a confirmation dialog (using shadcn/ui AlertDialog component). When the trash button is clicked, open the AlertDialog with a confirmation message asking 'Are you sure you want to delete this video? This action cannot be undone.' Include Cancel and Delete actions. On confirmation, call the deleteVideo mutation with the video ID. Show loading state on the delete button during mutation."
+          "description": "Add defensive null checks for the actor instance in all query and mutation functions before making backend calls. Wrap async operations in try-catch blocks to handle network errors gracefully. For each useQuery hook, add 'retry: false' or 'retry: 1' to prevent excessive retries on persistent failures. Ensure queryFn implementations throw meaningful errors when actor is unavailable (e.g., 'throw new Error(\"Backend connection not available\")') so React Query's error handling can surface them properly. Add enabled conditions like 'enabled: !!actor && !actorFetching' where appropriate to prevent queries from running before the actor is ready."
         }
       ]
     },
     {
-      "id": "REQ-23",
-      "summary": "Add trash icon delete button to VideoGrid thumbnails for authenticated user's own videos",
+      "id": "REQ-34",
+      "summary": "Add fallback loading states and null checks to FeedPage.tsx, VidlesPage.tsx, ProfilePage.tsx, VideoDetailPage.tsx, and MessagingPage.tsx to prevent rendering failures when data is unavailable",
       "acceptanceCriteria": [
-        "Trash icon button appears on video thumbnails in grid view for user's own videos",
-        "Button is positioned in a corner of the thumbnail (typically top-right) for easy access",
-        "Button triggers the same confirmation and deletion flow as in VideoCard",
-        "Button is hidden for videos created by other users"
+        "All page components handle undefined or null data gracefully",
+        "Loading skeletons or spinners are shown while data is being fetched",
+        "Empty states are displayed when no data is available",
+        "No page crashes due to missing or undefined props"
       ],
       "file_operations": [
         {
+          "path": "frontend/src/pages/FeedPage.tsx",
+          "operation": "modify",
+          "description": "Add null and undefined checks for the videos array returned by useGetMostLikedVideos. Display a loading spinner or skeleton UI when isLoading is true. Show an empty state message when data is an empty array or null. Ensure the component gracefully handles the case where the query fails by checking isError and displaying an error message. Prevent any mapping operations on undefined or null data by using optional chaining (videos?.map) or early returns."
+        },
+        {
+          "path": "frontend/src/pages/VidlesPage.tsx",
+          "operation": "modify",
+          "description": "Add null and undefined checks for the vidles array. Display a loading state while data is being fetched using isLoading from the query. Show an empty state with a helpful message when no vidles are available. Handle error states by checking isError and displaying a user-friendly error message. Use optional chaining when mapping over the vidles array to prevent crashes from undefined data."
+        },
+        {
+          "path": "frontend/src/pages/ProfilePage.tsx",
+          "operation": "modify",
+          "description": "Add null checks for userProfile and userVideos data. Display loading states for both profile and videos queries using their respective isLoading flags. Show appropriate empty states when profile data is null or videos array is empty. Handle cases where the user does not exist by checking for null profile after loading completes and displaying a 'User not found' message. Add optional chaining for all profile property accesses (e.g., userProfile?.username, userProfile?.bio) to prevent undefined access errors."
+        },
+        {
+          "path": "frontend/src/pages/VideoDetailPage.tsx",
+          "operation": "modify",
+          "description": "Add null checks for the video object returned by useGetVideo. Display a loading spinner while isLoading is true. Handle the case where video is null after loading by showing a 'Video not found' message. Add null checks for nested properties like video?.uploader before accessing them. Use optional chaining for all video property accesses throughout the component. Handle query errors by checking isError and displaying an error message."
+        },
+        {
+          "path": "frontend/src/pages/MessagingPage.tsx",
+          "operation": "modify",
+          "description": "Add null checks for conversation partners list and messages array. Display loading states for both queries using isLoading flags. Handle empty states when no conversations or messages exist with appropriate placeholder messages. Add optional chaining when accessing message properties. Ensure the selected conversation state handles cases where the selected user might not exist in the current data. Add error handling for both queries by checking isError states and displaying error messages."
+        }
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "summary": "Verify and fix the router configuration in App.tsx to ensure all routes (/, /vidles, /profile/:userId, /video/:videoId, /messages) are properly defined and accessible",
+      "acceptanceCriteria": [
+        "All routes are correctly configured with proper path patterns",
+        "Navigation between routes works without errors",
+        "404 or fallback route is defined for invalid paths",
+        "Route parameters are properly extracted and validated"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Review all route definitions to ensure they match the expected paths: '/' for FeedPage, '/vidles' for VidlesPage, '/profile/:userId' for ProfilePage, '/video/:videoId' for VideoDetailPage, and '/messages' for MessagingPage. Verify that route parameters are correctly specified with colons (e.g., :userId, :videoId). Add a catch-all fallback route (path='*') that redirects to the home page or displays a 404 component. Ensure all route components are properly imported and there are no typos in path definitions. Test that the router correctly parses route parameters and passes them to the page components."
+        }
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "summary": "Add defensive checks in useInternetIdentity.ts and useActor.ts to handle authentication initialization failures and prevent crashes when Internet Identity is unavailable",
+      "acceptanceCriteria": [
+        "AuthClient initialization errors are caught and handled gracefully",
+        "App continues to function in anonymous mode if authentication fails",
+        "User is shown a clear error message if Internet Identity is unavailable",
+        "No white screen occurs due to authentication initialization failures"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useInternetIdentity.tsx",
+          "operation": "modify",
+          "description": "NOTE: This file is marked as immutable in constraints. Do not modify this file. Instead, ensure that components consuming this hook handle potential errors from login/clear operations gracefully by wrapping calls in try-catch blocks."
+        },
+        {
+          "path": "frontend/src/components/LoginButton.tsx",
+          "operation": "modify",
+          "description": "Add comprehensive error handling around the login() call. Wrap the login operation in a try-catch block to catch and log any authentication initialization failures. Display a toast or error message to the user if Internet Identity is unavailable or login fails. Ensure the button does not become permanently disabled if login fails. Handle edge cases where the identity service might be temporarily unavailable by providing a retry mechanism or helpful error message. The component should gracefully degrade to show an error state without crashing the entire application."
+        }
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "summary": "Add safe fallbacks and validation to VideoCard.tsx, VideoGrid.tsx, and all video-related components to handle missing video data properties (url, title, uploader) without crashing",
+      "acceptanceCriteria": [
+        "Components display placeholder content when video properties are missing",
+        "No console errors from undefined property access",
+        "Video player has fallback behavior for invalid video URLs",
+        "All optional properties are checked before rendering"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/VideoCard.tsx",
+          "operation": "modify",
+          "description": "Add null and undefined checks for all video properties before rendering them. Use optional chaining for accessing nested properties like video?.videoFile, video?.title, video?.uploader. Provide fallback values for missing data: display 'Untitled Video' if title is missing, use the default avatar from frontend/public/assets/generated/default-avatar.dim_200x200.png if uploader info is unavailable, and show a placeholder or error message if videoFile is missing. Add error handling to the video player component to gracefully handle invalid video URLs. Ensure the component does not crash when video data is incomplete."
+        },
+        {
           "path": "frontend/src/components/VideoGrid.tsx",
           "operation": "modify",
-          "description": "Add a trash icon button positioned absolutely in the top-right corner of each video thumbnail. Use lucide-react's Trash2 icon with a semi-transparent dark background for visibility over video thumbnails. Include conditional rendering using useInternetIdentity hook to show the button only when the authenticated user's principal matches the video uploader. Import and use the same useDeleteVideo hook and AlertDialog confirmation pattern from REQ-22. Prevent click event from bubbling to the parent navigation link when the delete button is clicked (using e.stopPropagation())."
+          "description": "Add null checks before mapping over the videos array. Use optional chaining when accessing video properties in the grid items. Provide fallback thumbnail images using frontend/public/assets/generated/video-placeholder.dim_1920x1080.png when video thumbnails are unavailable. Handle cases where individual video objects might be null or malformed by filtering them out or showing placeholder cards. Ensure the grid displays gracefully even when some video data is incomplete."
+        }
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "summary": "Review and fix any import errors, missing dependencies, or module resolution issues in all frontend files that could prevent the application bundle from loading correctly",
+      "acceptanceCriteria": [
+        "All import statements resolve to valid modules",
+        "No circular dependencies exist in the codebase",
+        "All required npm packages are properly installed",
+        "TypeScript compilation completes without errors"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Review all import statements to ensure they point to existing files with correct paths. Check that all imported components, hooks, and utilities are properly exported from their source files. Verify that relative paths are correct (e.g., './components/...' vs '../components/...'). Fix any typos in import paths. Ensure all imported types from backend.d.ts are correctly referenced. Remove any unused imports that might cause confusion or bundling issues."
+        },
+        {
+          "path": "frontend/src/pages/FeedPage.tsx",
+          "operation": "modify",
+          "description": "Verify all import statements resolve correctly, including imports for VideoCard, ProfileSetupModal, and query hooks. Check that all dependencies are properly installed in package.json. Fix any incorrect relative paths or missing file extensions if needed by TypeScript/build tooling."
+        },
+        {
+          "path": "frontend/src/pages/VidlesPage.tsx",
+          "operation": "modify",
+          "description": "Review imports for components and hooks, ensuring all paths are correct and files exist. Verify that VideoCard and other imported components are properly exported from their source files."
+        },
+        {
+          "path": "frontend/src/pages/ProfilePage.tsx",
+          "operation": "modify",
+          "description": "Check all import statements for correctness, including imports for VideoGrid, EditProfileModal, FollowButton, and hooks. Ensure relative paths are accurate and no circular dependencies exist with other page or component files."
+        },
+        {
+          "path": "frontend/src/pages/VideoDetailPage.tsx",
+          "operation": "modify",
+          "description": "Verify imports for VideoCard, CommentSection, CommentInput, and related hooks. Check that all imported types and components are correctly exported and paths are valid."
+        },
+        {
+          "path": "frontend/src/pages/MessagingPage.tsx",
+          "operation": "modify",
+          "description": "Review imports for ConversationList, ChatThread, and messaging-related hooks. Ensure all paths are correct and no circular dependencies exist."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Verify that imports from backend.d.ts are correct and all types are properly exported. Check that the useActor hook import path is correct. Ensure no circular dependencies exist between hooks files."
+        },
+        {
+          "path": "frontend/src/components/VideoCard.tsx",
+          "operation": "modify",
+          "description": "Review all import statements for components, hooks, and types. Verify that all imported UI components from './ui/' directory exist and are properly exported. Check for any missing or incorrect imports that could cause bundling issues."
+        }
+      ]
+    },
+    {
+      "id": "REQ-39",
+      "summary": "Add console logging at critical initialization points (main.tsx, App.tsx, route components) to help diagnose where the application fails to render if white screen persists after fixes",
+      "acceptanceCriteria": [
+        "Console logs are added at app initialization in main.tsx",
+        "Each route component logs when it mounts",
+        "Provider initialization (QueryClient, InternetIdentity) is logged",
+        "Logs help identify where rendering stops in case of persistent issues"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/main.tsx",
+          "operation": "modify",
+          "description": "NOTE: This file is marked as immutable in constraints. Do not modify this file. Add diagnostic logging to the nearest modifiable entry point instead."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add console.log statements at the top of the App component function to log 'App component rendering'. Add a useEffect hook that logs 'App component mounted' when the component first mounts. Log when providers are initialized and when the router is about to render. These logs will help diagnose if the App component itself is failing to mount or if the failure occurs deeper in the component tree."
+        },
+        {
+          "path": "frontend/src/pages/FeedPage.tsx",
+          "operation": "modify",
+          "description": "Add console.log('FeedPage rendering') at the start of the component function. Add a useEffect with an empty dependency array that logs 'FeedPage mounted' when the component first mounts. Log the loading state and data availability to help diagnose data fetching issues."
+        },
+        {
+          "path": "frontend/src/pages/VidlesPage.tsx",
+          "operation": "modify",
+          "description": "Add console.log('VidlesPage rendering') at component start. Add a mount effect that logs 'VidlesPage mounted'. Include logging for query states to help identify if the page fails during data loading."
+        },
+        {
+          "path": "frontend/src/pages/ProfilePage.tsx",
+          "operation": "modify",
+          "description": "Add console.log('ProfilePage rendering with userId:', userId) at component start to log both rendering and the route parameter. Add a mount effect that logs 'ProfilePage mounted'. Log query states for profile and videos data."
+        },
+        {
+          "path": "frontend/src/pages/VideoDetailPage.tsx",
+          "operation": "modify",
+          "description": "Add console.log('VideoDetailPage rendering with videoId:', videoId) at component start. Add a mount effect logging 'VideoDetailPage mounted'. Log video data loading states and availability."
+        },
+        {
+          "path": "frontend/src/pages/MessagingPage.tsx",
+          "operation": "modify",
+          "description": "Add console.log('MessagingPage rendering') at component start. Add a mount effect that logs 'MessagingPage mounted'. Log authentication state and data loading states to help diagnose messaging initialization issues."
+        },
+        {
+          "path": "frontend/src/hooks/useActor.ts",
+          "operation": "modify",
+          "description": "NOTE: This file is marked as immutable in constraints. Do not modify this file directly. Ensure that components using this hook log the actor availability state to help diagnose actor initialization issues."
         }
       ]
     }

@@ -12,10 +12,13 @@ export default function MessagingPage() {
   const [selectedUser, setSelectedUser] = useState<Principal | null>(null);
 
   useEffect(() => {
+    console.log('MessagingPage mounted', { isAuthenticated: !!identity });
     if (!identity) {
       navigate({ to: '/' });
     }
   }, [identity, navigate]);
+
+  console.log('MessagingPage rendering', { isAuthenticated: !!identity });
 
   if (!identity) {
     return null;

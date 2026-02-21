@@ -15,6 +15,8 @@ export interface Comment {
   'author' : UserId,
   'timestamp' : Time,
 }
+export type ContentType = { 'video' : null } |
+  { 'vidle' : null };
 export type ExternalBlob = Uint8Array;
 export interface Message {
   'content' : string,
@@ -39,12 +41,15 @@ export type Username = string;
 export interface Video {
   'id' : VideoId,
   'title' : string,
+  'contentType' : ContentType,
   'tags' : Array<string>,
   'description' : string,
   'videoFile' : ExternalBlob,
   'likes' : bigint,
+  'durationSeconds' : bigint,
   'uploader' : UserId,
   'uploadTime' : Time,
+  'aspectRatio' : number,
 }
 export type VideoId = bigint;
 export interface _CaffeineStorageCreateCertificateResult {
@@ -94,7 +99,7 @@ export interface _SERVICE {
   'sendMessage' : ActorMethod<[UserId, string, [] | [string]], undefined>,
   'unfollowUser' : ActorMethod<[UserId], undefined>,
   'uploadVideo' : ActorMethod<
-    [string, string, Array<string>, ExternalBlob],
+    [string, string, Array<string>, ExternalBlob, ContentType, bigint, number],
     undefined
   >,
 }

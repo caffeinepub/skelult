@@ -1,15 +1,8 @@
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useGetUserVideos } from '../hooks/useQueries';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Video } from 'lucide-react';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface VideoLinkPickerProps {
   open: boolean;
@@ -19,7 +12,7 @@ interface VideoLinkPickerProps {
 
 export default function VideoLinkPicker({ open, onOpenChange, onSelectVideo }: VideoLinkPickerProps) {
   const { identity } = useInternetIdentity();
-  const userId = identity?.getPrincipal();
+  const userId = identity?.getPrincipal().toString();
   const { data: videos, isLoading } = useGetUserVideos(userId!);
 
   if (!identity || !userId) {
@@ -28,51 +21,43 @@ export default function VideoLinkPicker({ open, onOpenChange, onSelectVideo }: V
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Select a Video to Share</DialogTitle>
-          <DialogDescription>
-            Choose one of your uploaded videos to share in the conversation
-          </DialogDescription>
+          <DialogTitle className="text-2xl font-bold text-gradient">Select a Video</DialogTitle>
         </DialogHeader>
-
-        <ScrollArea className="h-[400px] pr-4">
-          {isLoading ? (
-            <div className="grid grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32 w-full rounded-lg" />
-              ))}
-            </div>
-          ) : videos && videos.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4">
-              {videos.map((video) => (
-                <button
-                  key={video.id.toString()}
-                  onClick={() => onSelectVideo(video.id.toString())}
-                  className="group relative aspect-video rounded-lg overflow-hidden border border-border hover:border-primary transition-colors"
-                >
-                  <video
-                    src={video.videoFile.getDirectURL()}
-                    className="w-full h-full object-cover"
-                    muted
-                  />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Video className="h-8 w-8 text-white" />
+        
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : videos && videos.length > 0 ? (
+          <div className="grid grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
+            {videos.map((video) => (
+              <button
+                key={video.id.toString()}
+                onClick={() => onSelectVideo(video.id.toString())}
+                className="group relative aspect-video rounded-xl overflow-hidden border-2 border-border hover:border-primary transition-all"
+              >
+                <video
+                  src={video.videoFile.getDirectURL()}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent">
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <p className="font-semibold text-white text-sm line-clamp-2">{video.title}</p>
+                    <Badge variant="secondary" className="mt-1 text-xs">
+                      {Number(video.likes)} likes
+                    </Badge>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
-                    <p className="text-white text-sm font-medium truncate">{video.title}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-8">
-              <Video className="h-12 w-12 mb-4 opacity-50" />
-              <p>You haven't uploaded any videos yet.</p>
-              <p className="text-sm mt-2">Upload a video first to share it in messages.</p>
-            </div>
-          )}
-        </ScrollArea>
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <p>You haven't uploaded any videos yet</p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

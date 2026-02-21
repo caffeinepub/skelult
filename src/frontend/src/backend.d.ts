@@ -17,20 +17,23 @@ export class ExternalBlob {
 export interface Video {
     id: VideoId;
     title: string;
+    contentType: ContentType;
     tags: Array<string>;
     description: string;
     videoFile: ExternalBlob;
     likes: bigint;
+    durationSeconds: bigint;
     uploader: UserId;
     uploadTime: Time;
+    aspectRatio: number;
 }
-export type UserId = Principal;
 export type Time = bigint;
 export interface Comment {
     text: string;
     author: UserId;
     timestamp: Time;
 }
+export type UserId = Principal;
 export type VideoId = bigint;
 export interface Message {
     content: string;
@@ -46,6 +49,10 @@ export interface UserProfile {
     followers: bigint;
     following: bigint;
     profilePicture?: ExternalBlob;
+}
+export enum ContentType {
+    video = "video",
+    vidle = "vidle"
 }
 export enum UserRole {
     admin = "admin",
@@ -71,5 +78,5 @@ export interface backendInterface {
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     sendMessage(recipient: UserId, content: string, videoLink: string | null): Promise<void>;
     unfollowUser(target: UserId): Promise<void>;
-    uploadVideo(title: string, description: string, tags: Array<string>, videoFile: ExternalBlob): Promise<void>;
+    uploadVideo(title: string, description: string, tags: Array<string>, videoFile: ExternalBlob, contentType: ContentType, durationSeconds: bigint, aspectRatio: number): Promise<void>;
 }

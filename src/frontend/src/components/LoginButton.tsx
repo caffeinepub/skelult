@@ -2,6 +2,7 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { LogIn, LogOut, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function LoginButton() {
   const { login, clear, loginStatus, identity } = useInternetIdentity();
@@ -12,8 +13,13 @@ export default function LoginButton() {
 
   const handleAuth = async () => {
     if (isAuthenticated) {
-      await clear();
-      queryClient.clear();
+      try {
+        await clear();
+        queryClient.clear();
+      } catch (error) {
+        console.error('Logout error:', error);
+        toast.error('Failed to logout. Please try again.');
+      }
     } else {
       try {
         await login();
@@ -22,6 +28,8 @@ export default function LoginButton() {
         if (error.message === 'User is already authenticated') {
           await clear();
           setTimeout(() => login(), 300);
+        } else {
+          toast.error('Failed to login. Please try again.');
         }
       }
     }
@@ -57,4 +65,3 @@ export default function LoginButton() {
     </Button>
   );
 }
-

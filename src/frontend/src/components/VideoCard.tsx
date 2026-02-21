@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Video } from '../backend';
+import { Video, ContentType } from '../backend';
 import LikeButton from './LikeButton';
 import ShareButton from './ShareButton';
 import { useGetUserProfile, useDeleteVideo } from '../hooks/useQueries';
@@ -34,10 +34,11 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const videoUrl = video.videoFile.getDirectURL();
+  const videoUrl = video.videoFile?.getDirectURL() || '';
   const uploadDate = new Date(Number(video.uploadTime) / 1000000);
   
   const isOwnVideo = identity && video.uploader.toString() === identity.getPrincipal().toString();
+  const isVidle = video.contentType === ContentType.vidle;
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on interactive elements
@@ -80,6 +81,14 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
             />
+            {/* Vidle Badge */}
+            {isVidle && (
+              <div className="absolute top-3 right-3 z-10">
+                <Badge className="bg-accent text-accent-foreground font-bold uppercase text-xs px-3 py-1 rounded-full neon-glow">
+                  VIDLE
+                </Badge>
+              </div>
+            )}
           </div>
 
           {/* Video Info */}
@@ -110,14 +119,14 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
 
             {/* Title & Description */}
             <div>
-              <h3 className="font-bold text-lg line-clamp-2 mb-1">{video.title}</h3>
+              <h3 className="font-bold text-lg line-clamp-2 mb-1">{video.title || 'Untitled Video'}</h3>
               {video.description && (
                 <p className="text-sm text-muted-foreground line-clamp-2">{video.description}</p>
               )}
             </div>
 
             {/* Tags */}
-            {video.tags.length > 0 && (
+            {video.tags && video.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {video.tags.slice(0, 3).map((tag, index) => (
                   <Badge key={index} variant="secondary" className="rounded-full text-xs">
@@ -134,7 +143,7 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
 
             {/* Actions */}
             <div className="flex items-center gap-4 pt-2 border-t border-border/50">
-              <LikeButton videoId={video.id} initialLikes={Number(video.likes)} />
+              <LikeButton videoId={video.id} initialLikes={Number(video.likes || 0)} />
               
               <button 
                 className="flex items-center gap-2 text-muted-foreground hover:text-secondary transition-colors"
@@ -167,9 +176,9 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Video</AlertDialogTitle>
+            <AlertDialogTitle>Delete {isVidle ? 'Vidle' : 'Video'}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this video? This action cannot be undone.
+              Are you sure you want to delete this {isVidle ? 'vidle' : 'video'}? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
