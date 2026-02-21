@@ -82,18 +82,25 @@ export default function MessagingPage() {
             </TabsContent>
 
             <TabsContent value="friends" className="flex-1 overflow-hidden m-0 p-4">
-              <div className="space-y-6">
-                {pendingRequestsCount > 0 && (
-                  <div>
-                    <h3 className="font-semibold mb-3 flex items-center gap-2">
-                      Friend Requests
-                      <Badge variant="secondary">{pendingRequestsCount}</Badge>
+              <div className="space-y-6 h-full overflow-y-auto">
+                {/* Pending Friend Requests Section - Always Visible */}
+                <div className="border-2 border-primary/30 rounded-lg p-4 bg-primary/5 neon-glow-subtle">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-gradient flex items-center gap-2">
+                      Pending Friend Requests
+                      {pendingRequestsCount > 0 && (
+                        <Badge variant="default" className="bg-primary text-primary-foreground">
+                          {pendingRequestsCount}
+                        </Badge>
+                      )}
                     </h3>
-                    <FriendRequestsList />
                   </div>
-                )}
-                <div>
-                  <h3 className="font-semibold mb-3">Your Friends</h3>
+                  <FriendRequestsList />
+                </div>
+
+                {/* Friends List Section */}
+                <div className="border border-border rounded-lg p-4">
+                  <h3 className="text-lg font-semibold mb-4">Your Friends</h3>
                   <FriendsList />
                 </div>
               </div>

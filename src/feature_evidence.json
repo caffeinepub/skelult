@@ -2,28 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-react-query-hooks-in-usequeries-ts-for-friend-system-operations-usesendfriendrequest-useacceptfriendrequest-usedeclinefriendrequest-usegetfriendrequests-usegetfriendslist-useunfriend-and-usesearchusers",
-      "featureTitle": "Create React Query hooks in useQueries.ts for friend system operations: useSendFriendRequest, useAcceptFriendRequest, useDeclineFriendRequest, useGetFriendRequests, useGetFriendsList, useUnfriend, and useSearchUsers",
-      "files": [
-        "frontend/src/hooks/useQueries.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-52"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-add-friends-button-to-the-messagingpage-component-that-opens-a-modal-dialog-with-a-search-bar-to-find-users-by-username",
-      "featureTitle": "Add 'Add Friends' button to the MessagingPage component that opens a modal dialog with a search bar to find users by username",
+      "featureId": "feature-update-messagingpage-component-to-ensure-the-friendrequestslist-component-is-properly-rendered-and-visible-in-the-skelmsg-interface-positioned-above-or-alongside-the-conversation-list-in-the-main-layout",
+      "featureTitle": "Update MessagingPage component to ensure the FriendRequestsList component is properly rendered and visible in the SkelMsg interface, positioned above or alongside the conversation list in the main layout",
       "files": [
         "frontend/src/pages/MessagingPage.tsx"
       ],
@@ -37,73 +17,13 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-53"
+        "REQ-60"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-create-addfriendsmodal-component-that-displays-a-search-bar-and-shows-search-results-with-user-avatars-usernames-and-send-request-buttons-for-each-user",
-      "featureTitle": "Create AddFriendsModal component that displays a search bar and shows search results with user avatars, usernames, and 'Send Request' buttons for each user",
-      "files": [
-        "frontend/src/components/AddFriendsModal.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-54"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-friendrequestslist-component-that-displays-pending-friend-requests-with-accept-and-decline-buttons-for-each-request",
-      "featureTitle": "Create FriendRequestsList component that displays pending friend requests with accept and decline buttons for each request",
-      "files": [
-        "frontend/src/components/FriendRequestsList.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-55"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-friendslist-component-that-displays-all-accepted-friends-with-profile-pictures-usernames-and-unfriend-buttons",
-      "featureTitle": "Create FriendsList component that displays all accepted friends with profile pictures, usernames, and unfriend buttons",
-      "files": [
-        "frontend/src/components/FriendsList.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-56"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-integrate-friendrequestslist-and-friendslist-components-into-the-messagingpage-layout-displaying-them-alongside-the-conversation-list",
-      "featureTitle": "Integrate FriendRequestsList and FriendsList components into the MessagingPage layout, displaying them alongside the conversation list",
+      "featureId": "feature-verify-that-the-usegetfriendrequests-react-query-hook-is-being-called-in-messagingpage-and-properly-fetching-pending-friend-requests-from-the-backend",
+      "featureTitle": "Verify that the useGetFriendRequests React Query hook is being called in MessagingPage and properly fetching pending friend requests from the backend",
       "files": [
         "frontend/src/pages/MessagingPage.tsx"
       ],
@@ -117,16 +37,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-57"
+        "REQ-61"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-friend-status-indicators-to-the-messaging-interface-showing-whether-a-conversation-partner-is-a-friend-has-a-pending-request-or-is-not-a-friend",
-      "featureTitle": "Add friend status indicators to the messaging interface showing whether a conversation partner is a friend, has a pending request, or is not a friend",
+      "featureId": "feature-add-visual-styling-to-the-pending-friend-requests-section-to-make-it-stand-out-with-a-clear-heading-appropriate-spacing-and-consistent-neon-theme-styling-matching-the-rest-of-skelmsg",
+      "featureTitle": "Add visual styling to the Pending Friend Requests section to make it stand out with a clear heading, appropriate spacing, and consistent neon theme styling matching the rest of SkelMsg",
       "files": [
-        "frontend/src/components/ChatThread.tsx",
-        "frontend/src/components/ConversationList.tsx"
+        "frontend/src/components/FriendRequestsList.tsx",
+        "frontend/src/pages/MessagingPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -138,27 +58,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-58"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-reduce-the-video-player-size-in-vidlespage-tsx-by-40-to-make-vertical-videos-fit-better-on-screen",
-      "featureTitle": "Reduce the video player size in VidlesPage.tsx by 40% to make vertical videos fit better on screen",
-      "files": [
-        "frontend/src/pages/VidlesPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-59"
+        "REQ-62"
       ],
       "confidence": "high"
     }

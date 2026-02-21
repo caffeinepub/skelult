@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 19,
+  "projectStateVersion": 21,
   "summary": "SkelUlt: A unified social media video platform combining features from Instagram, TikTok, YouTube, Facebook, and X for video posting and sharing",
   "architectural_notes": [
     "Multi-platform video hosting combining Instagram/TikTok/YouTube/Facebook/X features",
@@ -17,9 +17,10 @@
   "known_issues": [
     "White screen issue after Version 5 deployment - site not rendering content properly",
     "Delete button (trash icon) on videos not functioning when clicked - users unable to delete their own videos despite confirmation dialog implementation",
-    "Video/Vidle deletion incorrectly removes both content types when they should be independent (user reported deleting a video also deleted a vidle)"
+    "Video/Vidle deletion incorrectly removes both content types when they should be independent (user reported deleting a video also deleted a vidle)",
+    "Pending Friend Requests section not visible in SkelMsg - FriendRequestsList component exists but not displaying in MessagingPage"
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-implement-user-authentication-system-using-internet-identity-to-allow-users-to-sign-up-log-in-and-manage-their-accounts",
@@ -402,6 +403,30 @@
       "title": "Reduce the video player size in VidlesPage.tsx by 40% to make vertical videos fit better on screen",
       "reqIds": [
         "REQ-59"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-messagingpage-component-to-ensure-the-friendrequestslist-component-is-properly-rendered-and-visible-in-the-skelmsg-interface-positioned-above-or-alongside-the-conversation-list-in-the-main-layout",
+      "title": "Update MessagingPage component to ensure the FriendRequestsList component is properly rendered and visible in the SkelMsg interface, positioned above or alongside the conversation list in the main layout",
+      "reqIds": [
+        "REQ-60"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-verify-that-the-usegetfriendrequests-react-query-hook-is-being-called-in-messagingpage-and-properly-fetching-pending-friend-requests-from-the-backend",
+      "title": "Verify that the useGetFriendRequests React Query hook is being called in MessagingPage and properly fetching pending friend requests from the backend",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-visual-styling-to-the-pending-friend-requests-section-to-make-it-stand-out-with-a-clear-heading-appropriate-spacing-and-consistent-neon-theme-styling-matching-the-rest-of-skelmsg",
+      "title": "Add visual styling to the Pending Friend Requests section to make it stand out with a clear heading, appropriate spacing, and consistent neon theme styling matching the rest of SkelMsg",
+      "reqIds": [
+        "REQ-62"
       ],
       "version": 1
     }

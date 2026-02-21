@@ -1,50 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T10:19:28.189Z",
+  "generatedAt": "2026-02-21T11:25:16.108Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 11,
-    "implemented": 8,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-49",
-        "summary": "Add friend request data model to backend/main.mo with fields for sender Principal, recipient Principal, status (pending/accepted/declined), and timestamp",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-50",
-        "summary": "Implement backend functions to send friend requests, accept friend requests, decline friend requests, get pending friend requests, get accepted friends list, and unfriend (remove friendship)",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-51",
-        "summary": "Add backend searchUsers function that searches all registered users by username and returns matching user profiles with Principal ID, username, profile picture, and bio",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-52",
-        "summary": "Create React Query hooks in useQueries.ts for friend system operations: useSendFriendRequest, useAcceptFriendRequest, useDeclineFriendRequest, useGetFriendRequests, useGetFriendsList, useUnfriend, and useSearchUsers",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-53",
-        "summary": "Add 'Add Friends' button to the MessagingPage component that opens a modal dialog with a search bar to find users by username",
+        "id": "REQ-60",
+        "summary": "Update MessagingPage component to ensure the FriendRequestsList component is properly rendered and visible in the SkelMsg interface, positioned above or alongside the conversation list in the main layout",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/MessagingPage.tsx"
@@ -54,94 +22,39 @@
         ]
       },
       {
-        "id": "REQ-54",
-        "summary": "Create AddFriendsModal component that displays a search bar and shows search results with user avatars, usernames, and 'Send Request' buttons for each user",
+        "id": "REQ-61",
+        "summary": "Verify that the useGetFriendRequests React Query hook is being called in MessagingPage and properly fetching pending friend requests from the backend",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AddFriendsModal.tsx"
+          "frontend/src/pages/MessagingPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/AddFriendsModal.tsx"
+          "frontend/src/pages/MessagingPage.tsx"
         ]
       },
       {
-        "id": "REQ-55",
-        "summary": "Create FriendRequestsList component that displays pending friend requests with accept and decline buttons for each request",
+        "id": "REQ-62",
+        "summary": "Add visual styling to the Pending Friend Requests section to make it stand out with a clear heading, appropriate spacing, and consistent neon theme styling matching the rest of SkelMsg",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/pages/MessagingPage.tsx",
           "frontend/src/components/FriendRequestsList.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/pages/MessagingPage.tsx",
           "frontend/src/components/FriendRequestsList.tsx"
-        ]
-      },
-      {
-        "id": "REQ-56",
-        "summary": "Create FriendsList component that displays all accepted friends with profile pictures, usernames, and unfriend buttons",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/FriendsList.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/FriendsList.tsx"
-        ]
-      },
-      {
-        "id": "REQ-57",
-        "summary": "Integrate FriendRequestsList and FriendsList components into the MessagingPage layout, displaying them alongside the conversation list",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/MessagingPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/MessagingPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-58",
-        "summary": "Add friend status indicators to the messaging interface showing whether a conversation partner is a friend, has a pending request, or is not a friend",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/ConversationList.tsx",
-          "frontend/src/components/ChatThread.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/ConversationList.tsx",
-          "frontend/src/components/ChatThread.tsx"
-        ]
-      },
-      {
-        "id": "REQ-59",
-        "summary": "Reduce the video player size in VidlesPage.tsx by 40% to make vertical videos fit better on screen",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/VidlesPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/VidlesPage.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/AddFriendsModal.tsx",
-    "frontend/src/components/ChatThread.tsx",
-    "frontend/src/components/ConversationList.tsx",
     "frontend/src/components/FriendRequestsList.tsx",
-    "frontend/src/components/FriendsList.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
     "frontend/src/pages/MessagingPage.tsx",
-    "frontend/src/pages/VidlesPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
