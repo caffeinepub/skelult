@@ -1,0 +1,122 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-21T08:20:53.282Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 7,
+    "implemented": 5,
+    "items": [
+      {
+        "id": "REQ-14",
+        "summary": "Create a SkelMsg navigation option in the main Layout component header that opens a messaging interface, positioned alongside existing navigation items (home, upload, profile)",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/MessagingPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/MessagingPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-15",
+        "summary": "Implement backend message storage and retrieval system with sender Principal, recipient Principal, message text content, video link (optional Text field), and timestamp fields",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-16",
+        "summary": "Create a conversation list view showing all users the authenticated user has exchanged messages with, displaying the most recent message preview and timestamp for each conversation",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/ConversationList.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/ConversationList.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-17",
+        "summary": "Implement a chat thread view that displays the full message history between the authenticated user and a selected conversation partner, with messages grouped by sender and displaying timestamps",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/ChatThread.tsx",
+          "frontend/src/components/MessageBubble.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/ChatThread.tsx",
+          "frontend/src/components/MessageBubble.tsx"
+        ]
+      },
+      {
+        "id": "REQ-18",
+        "summary": "Create a message input component with a text field and send button, plus a button to attach/share SkelUlt video links from the user's feed",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/MessageInput.tsx",
+          "frontend/src/components/VideoLinkPicker.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/MessageInput.tsx",
+          "frontend/src/components/VideoLinkPicker.tsx"
+        ]
+      },
+      {
+        "id": "REQ-19",
+        "summary": "Implement automatic message polling that checks for new messages every 3 seconds using React Query's refetchInterval to simulate real-time updates",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/ChatThread.tsx",
+          "frontend/src/components/ConversationList.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/ChatThread.tsx",
+          "frontend/src/components/ConversationList.tsx"
+        ]
+      },
+      {
+        "id": "REQ-20",
+        "summary": "Add backend query function to retrieve all unique conversation partners for a given user Principal, returning an array of user Principals that have exchanged messages with the authenticated user",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/ChatThread.tsx",
+    "frontend/src/components/ConversationList.tsx",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/MessageBubble.tsx",
+    "frontend/src/components/MessageInput.tsx",
+    "frontend/src/components/VideoLinkPicker.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/MessagingPage.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

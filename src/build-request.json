@@ -1,0 +1,163 @@
+{
+  "kind": "build_request",
+  "title": "Add SkelMsg real-time messaging feature for video link sharing",
+  "projectName": "SkelUlt",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-14",
+      "text": "Create a SkelMsg navigation option in the main Layout component header that opens a messaging interface, positioned alongside existing navigation items (home, upload, profile)",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "SkelMsg should be just an option INSIDE SkelUlt"
+        ]
+      },
+      "acceptanceCriteria": [
+        "SkelMsg appears as a clickable icon or button in the main header navigation",
+        "Clicking the SkelMsg option opens the messaging interface",
+        "The messaging interface is clearly accessible from any page in the application"
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "text": "Implement backend message storage and retrieval system with sender Principal, recipient Principal, message text content, video link (optional Text field), and timestamp fields",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "people should send links of the videos",
+          "make this a real time chatting app"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Messages are stored with sender, recipient, content, optional video link, and timestamp",
+        "Backend provides functions to send messages between users",
+        "Backend provides functions to retrieve conversation history between two users",
+        "Messages are persisted across canister upgrades"
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "text": "Create a conversation list view showing all users the authenticated user has exchanged messages with, displaying the most recent message preview and timestamp for each conversation",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "Make it like WhatsApp, all in one chat-app"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Displays a list of all conversations with other users",
+        "Each conversation entry shows the other user's profile picture, username, and most recent message preview",
+        "Conversations are sorted by most recent message timestamp",
+        "Clicking a conversation opens the full chat thread with that user"
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "text": "Implement a chat thread view that displays the full message history between the authenticated user and a selected conversation partner, with messages grouped by sender and displaying timestamps",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "Make it like WhatsApp, all in one chat-app"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Messages are displayed in chronological order with sender identification",
+        "User's own messages appear on one side, recipient's messages on the other (WhatsApp-style layout)",
+        "Timestamps are visible for each message or message group",
+        "Video links are rendered as clickable links that navigate to the video detail page",
+        "The chat scrolls to show the most recent messages by default"
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "text": "Create a message input component with a text field and send button, plus a button to attach/share SkelUlt video links from the user's feed",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "people should send links of the videos"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Text input field allows users to type messages",
+        "Send button submits the message to the backend",
+        "Video link button opens a modal or dropdown to select from uploaded SkelUlt videos",
+        "Selected video links are included in the message payload",
+        "Input field clears after successful message send"
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "text": "Implement automatic message polling that checks for new messages every 3 seconds using React Query's refetchInterval to simulate real-time updates",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "make this a real time chatting app"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Messages refresh automatically every 3 seconds when a conversation is open",
+        "New messages appear without requiring manual refresh",
+        "Polling only occurs when the SkelMsg interface is active",
+        "Conversation list updates automatically to reflect new messages"
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "text": "Add backend query function to retrieve all unique conversation partners for a given user Principal, returning an array of user Principals that have exchanged messages with the authenticated user",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-final"
+        ],
+        "quotes": [
+          "Make it like WhatsApp, all in one chat-app"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Function returns a list of all users who have sent or received messages with the authenticated user",
+        "Results are deduplicated (each conversation partner appears only once)",
+        "Function is accessible only to authenticated users",
+        "Results can be used to populate the conversation list view"
+      ]
+    }
+  ],
+  "constraints": [
+    "Maintain single-actor Motoko architecture in backend/main.mo",
+    "Use React Query's refetchInterval for polling instead of WebSockets",
+    "Do not modify immutable frontend paths: hooks/useInternetIdentity.ts, hooks/useInternetIdentity.tsx, hooks/useActor.ts, main.tsx, components/ui",
+    "Video links shared in messages must reference existing SkelUlt videos uploaded to the platform",
+    "All messaging features must require Internet Identity authentication"
+  ],
+  "nonGoals": [
+    "Real-time WebSocket connections",
+    "Read receipts or typing indicators",
+    "Message encryption",
+    "Group chats or multi-user conversations",
+    "Direct video file uploads within chat (only video links)",
+    "Voice or video calling features",
+    "Message editing or deletion after sending"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

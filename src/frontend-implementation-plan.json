@@ -1,0 +1,128 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Add SkelMsg real-time messaging feature for video link sharing",
+  "requirements": [
+    {
+      "id": "REQ-14",
+      "summary": "Add SkelMsg navigation option in Layout component header that opens messaging interface",
+      "acceptanceCriteria": [
+        "SkelMsg appears as a clickable icon or button in the main header navigation",
+        "Clicking the SkelMsg option opens the messaging interface",
+        "The messaging interface is clearly accessible from any page in the application"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Add a SkelMsg button/icon to the main header navigation alongside existing home, upload, and profile buttons. The button should open the messaging interface when clicked, using a modal or routing approach depending on current layout structure."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register a new route for /messages to render the MessagingPage component. Ensure the route is protected and requires authentication."
+        },
+        {
+          "path": "frontend/src/pages/MessagingPage.tsx",
+          "operation": "create",
+          "description": "Create the main messaging interface container page that displays the conversation list and chat thread components side-by-side or in a responsive layout. Handle authentication checks and redirect unauthenticated users."
+        }
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "summary": "Create conversation list view showing all users with message history, recent message preview, and timestamps",
+      "acceptanceCriteria": [
+        "Displays a list of all conversations with other users",
+        "Each conversation entry shows the other user's profile picture, username, and most recent message preview",
+        "Conversations are sorted by most recent message timestamp",
+        "Clicking a conversation opens the full chat thread with that user"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ConversationList.tsx",
+          "operation": "create",
+          "description": "Create a component that fetches conversation partners using the getConversationPartners backend capability, then retrieves user profiles and messages for each partner. Display each conversation with avatar (using frontend/public/assets/generated/default-avatar.dim_200x200.png as fallback), username, most recent message preview, and timestamp. Sort conversations by most recent message. Handle click events to select a conversation."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add React Query hooks for messaging: useGetConversationPartners to fetch conversation partners, useGetMessagesWith to fetch messages with a specific user, and useSendMessage mutation for sending messages. Configure appropriate query keys and cache invalidation strategies."
+        }
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "summary": "Implement chat thread view displaying full message history with timestamps and clickable video links",
+      "acceptanceCriteria": [
+        "Messages are displayed in chronological order with sender identification",
+        "User's own messages appear on one side, recipient's messages on the other (WhatsApp-style layout)",
+        "Timestamps are visible for each message or message group",
+        "Video links are rendered as clickable links that navigate to the video detail page",
+        "The chat scrolls to show the most recent messages by default"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ChatThread.tsx",
+          "operation": "create",
+          "description": "Create a component that displays messages in a scrollable container with WhatsApp-style layout. Distinguish own messages vs recipient messages with different alignments and styling. Display timestamps for each message or message group. Render video links as clickable elements that navigate to /video/:id routes. Auto-scroll to bottom on mount and when new messages arrive. Show the recipient's profile info in a header."
+        },
+        {
+          "path": "frontend/src/components/MessageBubble.tsx",
+          "operation": "create",
+          "description": "Create a reusable message bubble component that renders message content, timestamp, and optional video link. Handle own vs other user styling differences. Parse videoLink field and render as a clickable link to the video detail page when present."
+        }
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "summary": "Create message input component with text field, send button, and video link attachment from user's feed",
+      "acceptanceCriteria": [
+        "Text input field allows users to type messages",
+        "Send button submits the message to the backend",
+        "Video link button opens a modal or dropdown to select from uploaded SkelUlt videos",
+        "Selected video links are included in the message payload",
+        "Input field clears after successful message send"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/MessageInput.tsx",
+          "operation": "create",
+          "description": "Create a message input component with a textarea for message content, a send button that calls the sendMessage backend capability, and a video link button that opens a video picker. Clear the input after successful send. Handle loading states and errors with toast notifications. Use the useSendMessage mutation from useQueries.ts."
+        },
+        {
+          "path": "frontend/src/components/VideoLinkPicker.tsx",
+          "operation": "create",
+          "description": "Create a modal or dropdown component that displays the authenticated user's uploaded videos using getUserVideos backend capability. Allow selection of a video to attach its link to the message. Pass the selected video ID or URL back to the MessageInput component. Use video thumbnails from the ExternalBlob getDirectURL method for preview."
+        }
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "summary": "Implement automatic message polling every 3 seconds using React Query's refetchInterval",
+      "acceptanceCriteria": [
+        "Messages refresh automatically every 3 seconds when a conversation is open",
+        "New messages appear without requiring manual refresh",
+        "Polling only occurs when the SkelMsg interface is active",
+        "Conversation list updates automatically to reflect new messages"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Configure the useGetMessagesWith and useGetConversationPartners query hooks with refetchInterval set to 3000ms. Ensure polling only occurs when queries are enabled (conversation is active). Add proper stale time and cache time configurations to balance freshness with performance."
+        },
+        {
+          "path": "frontend/src/components/ChatThread.tsx",
+          "operation": "modify",
+          "description": "Ensure the ChatThread component enables automatic polling by keeping the useGetMessagesWith query active while the component is mounted. Handle new message arrivals by auto-scrolling to the bottom when the user is already near the bottom of the chat."
+        },
+        {
+          "path": "frontend/src/components/ConversationList.tsx",
+          "operation": "modify",
+          "description": "Enable automatic polling for the conversation list to reflect new messages. Update the most recent message preview and timestamp when new data arrives. Maintain the selected conversation state during polling updates."
+        }
+      ]
+    }
+  ]
+}

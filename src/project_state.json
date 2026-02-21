@@ -1,0 +1,219 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 7,
+  "summary": "SkelUlt: A unified social media video platform combining features from Instagram, TikTok, YouTube, Facebook, and X for video posting and sharing",
+  "architectural_notes": [
+    "Multi-platform video hosting combining Instagram/TikTok/YouTube/Facebook/X features",
+    "Requires video storage and streaming infrastructure",
+    "Social networking capabilities needed for user interactions",
+    "SkelMsg messaging system requires polling mechanism for message updates (real-time WebSocket alternative)",
+    "Video link sharing in SkelMsg allows users to share SkelUlt video URLs in conversations",
+    "SkelMsg is an integrated feature within SkelUlt, not a separate application"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-implement-user-authentication-system-using-internet-identity-to-allow-users-to-sign-up-log-in-and-manage-their-accounts",
+      "title": "Implement user authentication system using Internet Identity to allow users to sign up, log in, and manage their accounts",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-user-profile-system-with-username-bio-profile-picture-and-follower-following-counts",
+      "title": "Create user profile system with username, bio, profile picture, and follower/following counts",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-video-upload-functionality-allowing-users-to-upload-video-files-with-title-description-and-tags",
+      "title": "Implement video upload functionality allowing users to upload video files with title, description, and tags",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-main-video-feed-that-displays-uploaded-videos-in-a-scrollable-format-with-video-player-title-description-and-creator-information",
+      "title": "Create a main video feed that displays uploaded videos in a scrollable format with video player, title, description, and creator information",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-like-functionality-allowing-users-to-like-videos-with-visible-like-counts",
+      "title": "Implement like functionality allowing users to like videos with visible like counts",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-commenting-system-allowing-users-to-post-text-comments-on-videos-with-timestamps",
+      "title": "Create commenting system allowing users to post text comments on videos with timestamps",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-share-functionality-allowing-users-to-copy-video-links",
+      "title": "Implement share functionality allowing users to copy video links",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-follow-unfollow-system-allowing-users-to-follow-other-creators",
+      "title": "Create follow/unfollow system allowing users to follow other creators",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-user-profile-page-showing-all-videos-uploaded-by-that-user-in-a-grid-layout",
+      "title": "Implement user profile page showing all videos uploaded by that user in a grid layout",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-design-a-modern-vibrant-social-media-interface-with-a-bold-neon-inspired-color-scheme-pink-cyan-electric-green-accents-rounded-corners-smooth-animations-and-a-mobile-first-responsive-layout-that-feels-energetic-and-engaging",
+      "title": "Design a modern, vibrant social media interface with a bold neon-inspired color scheme (pink, cyan, electric green accents), rounded corners, smooth animations, and a mobile-first responsive layout that feels energetic and engaging",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-project-name-in-project-state-json-from-ultskel-to-skelult",
+      "title": "Update the project name in project_state.json from 'UltSkel' to 'SkelUlt'",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-skelmsg-navigation-option-in-the-main-layout-component-header-that-opens-a-messaging-interface-positioned-alongside-existing-navigation-items-home-upload-profile",
+      "title": "Create a SkelMsg navigation option in the main Layout component header that opens a messaging interface, positioned alongside existing navigation items (home, upload, profile)",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-conversation-list-view-showing-all-users-the-authenticated-user-has-exchanged-messages-with-displaying-the-most-recent-message-preview-and-timestamp-for-each-conversation",
+      "title": "Create a conversation list view showing all users the authenticated user has exchanged messages with, displaying the most recent message preview and timestamp for each conversation",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-chat-thread-view-that-displays-the-full-message-history-between-the-authenticated-user-and-a-selected-conversation-partner-with-messages-grouped-by-sender-and-displaying-timestamps",
+      "title": "Implement a chat thread view that displays the full message history between the authenticated user and a selected conversation partner, with messages grouped by sender and displaying timestamps",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-message-input-component-with-a-text-field-and-send-button-plus-a-button-to-attach-share-skelult-video-links-from-the-user-s-feed",
+      "title": "Create a message input component with a text field and send button, plus a button to attach/share SkelUlt video links from the user's feed",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-automatic-message-polling-that-checks-for-new-messages-every-3-seconds-using-react-query-s-refetchinterval-to-simulate-real-time-updates",
+      "title": "Implement automatic message polling that checks for new messages every 3 seconds using React Query's refetchInterval to simulate real-time updates",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Video upload and posting functionality",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "User authentication and profiles",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Video feed display and browsing",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Social engagement features (likes, comments, shares)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Update the application title in frontend/index.html from 'UltSkel' to 'SkelUlt'",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Update any visible branding text in the Layout component header to display 'SkelUlt' instead of 'UltSkel'",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Add video deletion functionality allowing users to delete their own uploaded videos",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Implement SkelMsg: a real-time messaging feature integrated into SkelUlt where users can chat and share video links",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Implement backend message storage and retrieval system with sender Principal, recipient Principal, message text content, video link (optional Text field), and timestamp fields",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add backend query function to retrieve all unique conversation partners for a given user Principal, returning an array of user Principals that have exchanged messages with the authenticated user",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "SkelUlt",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

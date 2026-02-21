@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 1rem;
+        /* Neon-inspired light mode */
+        --background: 0.98 0.01 280;
+        --foreground: 0.15 0.02 280;
+        --card: 1 0 0;
+        --card-foreground: 0.15 0.02 280;
+        --popover: 1 0 0;
+        --popover-foreground: 0.15 0.02 280;
+        --primary: 0.65 0.28 330; /* Neon Pink */
+        --primary-foreground: 1 0 0;
+        --secondary: 0.70 0.20 195; /* Neon Cyan */
+        --secondary-foreground: 0.15 0.02 280;
+        --muted: 0.95 0.01 280;
+        --muted-foreground: 0.50 0.02 280;
+        --accent: 0.75 0.25 145; /* Electric Green */
+        --accent-foreground: 0.15 0.02 280;
+        --destructive: 0.60 0.25 25;
+        --destructive-foreground: 1 0 0;
+        --border: 0.90 0.02 280;
+        --input: 0.90 0.02 280;
+        --ring: 0.65 0.28 330;
+        --chart-1: 0.65 0.28 330;
+        --chart-2: 0.70 0.20 195;
+        --chart-3: 0.75 0.25 145;
+        --chart-4: 0.68 0.24 270;
+        --chart-5: 0.72 0.22 60;
+    }
+
+    .dark {
+        /* Neon-inspired dark mode */
+        --background: 0.12 0.02 280;
+        --foreground: 0.98 0.01 280;
+        --card: 0.18 0.02 280;
+        --card-foreground: 0.98 0.01 280;
+        --popover: 0.15 0.02 280;
+        --popover-foreground: 0.98 0.01 280;
+        --primary: 0.70 0.30 330; /* Brighter Neon Pink */
+        --primary-foreground: 0.12 0.02 280;
+        --secondary: 0.75 0.22 195; /* Brighter Neon Cyan */
+        --secondary-foreground: 0.12 0.02 280;
+        --muted: 0.22 0.02 280;
+        --muted-foreground: 0.65 0.02 280;
+        --accent: 0.80 0.28 145; /* Brighter Electric Green */
+        --accent-foreground: 0.12 0.02 280;
+        --destructive: 0.65 0.28 25;
+        --destructive-foreground: 0.98 0.01 280;
+        --border: 0.25 0.02 280;
+        --input: 0.25 0.02 280;
+        --ring: 0.70 0.30 330;
+        --chart-1: 0.70 0.30 330;
+        --chart-2: 0.75 0.22 195;
+        --chart-3: 0.80 0.28 145;
+        --chart-4: 0.72 0.26 270;
+        --chart-5: 0.76 0.24 60;
+    }
+
+    * {
+        @apply border-border;
+    }
+    
+    body {
+        @apply bg-background text-foreground;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    }
+}
+
+@layer utilities {
+    .neon-glow {
+        box-shadow: 0 0 10px oklch(var(--primary) / 0.5),
+                    0 0 20px oklch(var(--primary) / 0.3),
+                    0 0 30px oklch(var(--primary) / 0.1);
+    }
+    
+    .neon-glow-cyan {
+        box-shadow: 0 0 10px oklch(var(--secondary) / 0.5),
+                    0 0 20px oklch(var(--secondary) / 0.3),
+                    0 0 30px oklch(var(--secondary) / 0.1);
+    }
+    
+    .neon-glow-green {
+        box-shadow: 0 0 10px oklch(var(--accent) / 0.5),
+                    0 0 20px oklch(var(--accent) / 0.3),
+                    0 0 30px oklch(var(--accent) / 0.1);
+    }
+    
+    .gradient-neon {
+        background: linear-gradient(135deg, 
+            oklch(var(--primary)) 0%, 
+            oklch(var(--secondary)) 50%, 
+            oklch(var(--accent)) 100%);
+    }
+    
+    .text-gradient {
+        background: linear-gradient(135deg, 
+            oklch(var(--primary)) 0%, 
+            oklch(var(--secondary)) 50%, 
+            oklch(var(--accent)) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, textarea, select {
+    @apply transition-all duration-300 ease-in-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-primary/50 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+}
+
+/* Video player custom styles */
+video {
+    @apply rounded-2xl;
+}
+
+/* Animation keyframes */
+@keyframes pulse-neon {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-pulse-neon {
+    animation: pulse-neon 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
