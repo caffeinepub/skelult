@@ -132,10 +132,10 @@ function VidleCard({ vidle }: { vidle: any }) {
 
   return (
     <div className="bg-card border-2 border-border/50 rounded-3xl overflow-hidden hover:border-primary/50 transition-all hover:shadow-neon">
-      {/* Video Player - Optimized for 9:16 */}
+      {/* Video Player - Reduced by 40% */}
       <div 
         className="relative bg-muted mx-auto cursor-pointer"
-        style={{ maxWidth: '450px', aspectRatio: '9/16' }}
+        style={{ maxWidth: '270px', aspectRatio: '9/16' }}
         onClick={handleVideoClick}
       >
         <video

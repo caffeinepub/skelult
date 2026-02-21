@@ -1,9 +1,11 @@
-import { useGetConversationPartners, useGetUserProfile, useGetMessagesWith } from '../hooks/useQueries';
+import { useGetConversationPartners, useGetUserProfile, useGetMessagesWith, useGetFriendsList } from '../hooks/useQueries';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import type { Principal } from '@dfinity/principal';
 import { formatDistanceToNow } from 'date-fns';
+import { UserCheck } from 'lucide-react';
 
 interface ConversationListProps {
   selectedUser: Principal | null;
@@ -38,23 +40,18 @@ export default function ConversationList({ selectedUser, onSelectUser }: Convers
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-border">
-        <h2 className="font-semibold text-lg">Messages</h2>
+    <ScrollArea className="flex-1">
+      <div className="p-2">
+        {partners.map((partner) => (
+          <ConversationItem
+            key={partner.toString()}
+            partnerId={partner}
+            isSelected={selectedUser?.toString() === partner.toString()}
+            onSelect={() => onSelectUser(partner)}
+          />
+        ))}
       </div>
-      <ScrollArea className="flex-1">
-        <div className="p-2">
-          {partners.map((partner) => (
-            <ConversationItem
-              key={partner.toString()}
-              partnerId={partner}
-              isSelected={selectedUser?.toString() === partner.toString()}
-              onSelect={() => onSelectUser(partner)}
-            />
-          ))}
-        </div>
-      </ScrollArea>
-    </div>
+    </ScrollArea>
   );
 }
 
@@ -67,9 +64,11 @@ interface ConversationItemProps {
 function ConversationItem({ partnerId, isSelected, onSelect }: ConversationItemProps) {
   const { data: profile } = useGetUserProfile(partnerId.toString());
   const { data: messages } = useGetMessagesWith(partnerId.toString());
+  const { data: friends } = useGetFriendsList();
 
   const lastMessage = messages && messages.length > 0 ? messages[messages.length - 1] : null;
   const lastMessageTime = lastMessage ? new Date(Number(lastMessage.timestamp) / 1000000) : null;
+  const isFriend = friends?.some(f => f.toString() === partnerId.toString());
 
   return (
     <button
@@ -78,28 +77,40 @@ function ConversationItem({ partnerId, isSelected, onSelect }: ConversationItemP
         isSelected ? 'bg-accent' : ''
       }`}
     >
-      <Avatar className="h-12 w-12">
-        <AvatarImage 
-          src={profile?.profilePicture?.getDirectURL()} 
-          alt={profile?.username || 'User'} 
-        />
-        <AvatarFallback>
-          <img src="/assets/generated/default-avatar.dim_200x200.png" alt="Avatar" />
-        </AvatarFallback>
-      </Avatar>
+      <div className="relative">
+        <Avatar className="h-12 w-12">
+          <AvatarImage 
+            src={profile?.profilePicture?.getDirectURL()} 
+            alt={profile?.username || 'User'} 
+          />
+          <AvatarFallback>
+            <img src="/assets/generated/default-avatar.dim_200x200.png" alt="Avatar" />
+          </AvatarFallback>
+        </Avatar>
+        {isFriend && (
+          <div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-1">
+            <UserCheck className="h-3 w-3 text-primary-foreground" />
+          </div>
+        )}
+      </div>
       <div className="flex-1 text-left overflow-hidden">
-        <div className="flex items-center justify-between">
-          <p className="font-semibold truncate">{profile?.username || 'Loading...'}</p>
-          {lastMessageTime && (
-            <span className="text-xs text-muted-foreground">
-              {formatDistanceToNow(lastMessageTime, { addSuffix: true })}
-            </span>
+        <div className="flex items-center gap-2">
+          <p className="font-semibold truncate">{profile?.username || 'Unknown User'}</p>
+          {isFriend && (
+            <Badge variant="secondary" className="text-xs px-1.5 py-0">Friend</Badge>
           )}
         </div>
         {lastMessage && (
-          <p className="text-sm text-muted-foreground truncate">
-            {lastMessage.videoLink ? '📹 Video link' : lastMessage.content}
-          </p>
+          <>
+            <p className="text-sm text-muted-foreground truncate">
+              {lastMessage.videoLink ? '📹 Shared a video' : lastMessage.content}
+            </p>
+            {lastMessageTime && (
+              <p className="text-xs text-muted-foreground">
+                {formatDistanceToNow(lastMessageTime, { addSuffix: true })}
+              </p>
+            )}
+          </>
         )}
       </div>
     </button>

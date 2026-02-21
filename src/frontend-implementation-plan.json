@@ -1,73 +1,153 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add SkelUlt logo and Enable/Disable follow button with animation",
+  "title": "Implement friend system for SkelMsg with user search and reduce Vidles player size",
   "requirements": [
     {
-      "id": "REQ-40",
-      "summary": "Add SkelUlt logo to Layout header with consistent light/dark mode styling",
+      "id": "REQ-52",
+      "summary": "Create React Query hooks for friend system operations including send/accept/decline friend requests, get friend requests/list, unfriend, and search users",
       "acceptanceCriteria": [
-        "Logo appears in the top-left corner of the Layout header",
-        "Logo is small and does not overwhelm other header elements",
-        "Logo displays with consistent styling in both light and dark theme modes",
-        "Logo uses the generated image asset from frontend/public/assets/generated"
+        "All hooks follow existing React Query patterns in useQueries.ts",
+        "Mutation hooks include optimistic updates and cache invalidation",
+        "Search hook includes debouncing for performance",
+        "Hooks include proper error handling and loading states"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/Layout.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add the SkelUlt logo image to the header's top-left corner using the generated asset at frontend/public/assets/generated/skelult-logo.dim_256x256.png. Position the logo before the navigation links, apply appropriate sizing (small, non-intrusive), and ensure it renders consistently in both light and dark modes without additional styling variations. The logo should link to the feed page for easy navigation to home."
+          "description": "Add React Query hooks for friend system: useSendFriendRequest (mutation), useAcceptFriendRequest (mutation), useDeclineFriendRequest (mutation), useGetFriendRequests (query), useGetFriendsList (query), useUnfriend (mutation), and useSearchUsers (query with debouncing). Follow existing patterns for optimistic updates, cache invalidation on mutations, and proper error handling. The search hook should debounce input to avoid excessive backend calls."
         }
       ]
     },
     {
-      "id": "REQ-41",
-      "summary": "Add Enable button next to like button on VideoCard for following video creators",
+      "id": "REQ-53",
+      "summary": "Add 'Add Friends' button to MessagingPage that opens a modal dialog with user search functionality",
       "acceptanceCriteria": [
-        "Enable button appears next to the like button on all video cards",
-        "Button text displays 'Enable' when the user is not following the video creator",
-        "Clicking the Enable button follows/subscribes to the video creator",
-        "Button smoothly animates and transitions to 'Disable' state after clicking"
+        "Add Friends button is positioned prominently in the MessagingPage UI",
+        "Clicking the button opens a modal dialog component",
+        "Modal includes a search input field at the top",
+        "Modal can be closed via X button or clicking outside"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/VideoCard.tsx",
+          "path": "frontend/src/pages/MessagingPage.tsx",
           "operation": "modify",
-          "description": "Add an Enable/Disable button next to the LikeButton in the video card's action button row. Use the existing FollowButton component infrastructure to handle follow/unfollow logic. Position the button between the like button and other action buttons. The button should check if the current user is following the video uploader and display 'Enable' (not following) or 'Disable' (following) accordingly. Include authentication checks to ensure only logged-in users can interact with the button. Verify the FollowButton component's usage instructions before implementing to ensure proper integration with the existing follow system."
+          "description": "Add state management for AddFriendsModal visibility and an 'Add Friends' button in the messaging page header area. Position the button prominently near the conversation list section. Wire the button click to open the AddFriendsModal component with proper state handling for modal open/close."
         }
       ]
     },
     {
-      "id": "REQ-42",
-      "summary": "Implement smooth animation for Enable/Disable button state transitions",
+      "id": "REQ-54",
+      "summary": "Create AddFriendsModal component with user search bar and results list showing avatars, usernames, and send request buttons",
       "acceptanceCriteria": [
-        "Button smoothly animates when transitioning between Enable and Disable states",
-        "Visual transition effects are consistent with the neon-inspired design theme",
-        "Animation completes within a reasonable timeframe (300-500ms)",
-        "Button remains interactive and responsive during and after animation"
+        "Search bar accepts text input and triggers search on typing",
+        "Search results display below the search bar in a scrollable list",
+        "Each result shows user profile picture, username, and 'Send Request' button",
+        "Send Request button becomes disabled after sending with 'Request Sent' label",
+        "Empty search shows a helpful message",
+        "Loading state displays while searching"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/VideoCard.tsx",
-          "operation": "modify",
-          "description": "Add CSS transition effects to the Enable/Disable button for smooth state changes. Implement a transition animation (300-500ms duration) that includes visual feedback such as background color shift, scale transform, or opacity changes when toggling between Enable and Disable states. Use Tailwind's transition utilities and neon-themed colors from the existing design system (cyan accents, dark/light mode compatible). Ensure the button remains clickable and responsive throughout the animation. The animation should feel polished and consistent with the app's neon-inspired aesthetic."
+          "path": "frontend/src/components/AddFriendsModal.tsx",
+          "operation": "create",
+          "description": "Create modal component using shadcn/ui Dialog that displays a search input field at the top and search results below. Use the useSearchUsers hook with debounced input. Display results in a scrollable list with user profile picture (or default avatar), username, and 'Send Request' button. Track sent requests locally to disable buttons and show 'Request Sent' label. Include loading spinner during search and helpful empty state messages. Style with neon-themed OKLCH colors matching the existing design system."
         }
       ]
     },
     {
-      "id": "REQ-43",
-      "summary": "Implement Disable button functionality for unfollowing video creators",
+      "id": "REQ-55",
+      "summary": "Create FriendRequestsList component displaying pending friend requests with accept and decline buttons",
       "acceptanceCriteria": [
-        "Clicking the Disable button unfollows/unsubscribes from the video creator",
-        "Button smoothly animates back to 'Enable' state after unfollowing",
-        "Follow/unfollow action updates the user's follow list immediately (optimistic UI)",
-        "Follow state persists correctly after page refresh"
+        "Component displays all pending friend requests for the authenticated user",
+        "Each request shows sender's profile picture and username",
+        "Accept button changes request status to accepted",
+        "Decline button removes or marks request as declined",
+        "List updates in real-time after accepting/declining",
+        "Empty state message displays when no pending requests exist"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/VideoCard.tsx",
+          "path": "frontend/src/components/FriendRequestsList.tsx",
+          "operation": "create",
+          "description": "Create component that uses useGetFriendRequests hook to fetch pending requests. Display each request with sender's profile picture (fetched via getUserProfile), username, accept button, and decline button. Use useAcceptFriendRequest and useDeclineFriendRequest mutations with optimistic updates. Include loading states and an empty state message ('No pending friend requests') when the list is empty. Style consistently with neon-themed UI."
+        }
+      ]
+    },
+    {
+      "id": "REQ-56",
+      "summary": "Create FriendsList component displaying accepted friends with profile pictures, usernames, and unfriend buttons",
+      "acceptanceCriteria": [
+        "Component displays all accepted friends for the authenticated user",
+        "Each friend shows profile picture and username",
+        "Unfriend button removes the friendship connection",
+        "Confirmation dialog appears before unfriending",
+        "List updates after unfriending",
+        "Empty state message displays when no friends exist"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/FriendsList.tsx",
+          "operation": "create",
+          "description": "Create component that uses useGetFriendsList hook to fetch accepted friends. For each friend Principal, fetch their profile using getUserProfile to display profile picture and username. Add an unfriend button that triggers a confirmation dialog (using shadcn/ui AlertDialog) before calling useUnfriend mutation. Include optimistic updates and proper cache invalidation. Display empty state message ('No friends yet') when list is empty. Style with neon-themed design."
+        }
+      ]
+    },
+    {
+      "id": "REQ-57",
+      "summary": "Integrate FriendRequestsList and FriendsList components into MessagingPage layout alongside conversation list",
+      "acceptanceCriteria": [
+        "Friend requests section appears above or within the messaging interface",
+        "Friends list is accessible from the messaging interface",
+        "Layout maintains responsive design on mobile and desktop",
+        "Components integrate seamlessly with existing neon-themed UI"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/MessagingPage.tsx",
           "operation": "modify",
-          "description": "Implement the unfollow functionality for the Disable button state. When clicked in the Disable state, the button should call the unfollowUser mutation from useQueries hook to unsubscribe from the video creator. Apply optimistic UI updates so the button immediately transitions back to 'Enable' state before the backend confirms the action. Include error handling with toast notifications if the unfollow action fails. Ensure the follow state persists correctly by relying on the existing React Query cache invalidation patterns in useQueries. The button should animate smoothly back to the Enable state using the same transition effects defined in REQ-42."
+          "description": "Integrate FriendRequestsList above the ConversationList component in the left panel of the messaging interface. Add a collapsible or tabbed section that allows toggling between 'Conversations' and 'Friends' views, where the Friends view shows FriendsList. Ensure responsive layout works on mobile and desktop, maintaining the two-column layout on larger screens and stacking on mobile. Preserve existing neon-themed styling and ensure smooth integration with the conversation list."
+        }
+      ]
+    },
+    {
+      "id": "REQ-58",
+      "summary": "Add friend status indicators to messaging interface showing conversation partner's friend status",
+      "acceptanceCriteria": [
+        "Conversation list shows friend status badge for each conversation partner",
+        "Chat thread header displays friend status",
+        "Visual indicator distinguishes between friend, pending, and non-friend statuses",
+        "Status updates in real-time when friend status changes"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ConversationList.tsx",
+          "operation": "modify",
+          "description": "Add friend status badges to each conversation item. Use useGetFriendsList and useGetFriendRequests hooks to determine if each conversation partner is a friend, has a pending request, or is not a friend. Display visual indicators (e.g., green badge for friends, yellow for pending, gray for non-friends) next to usernames. Ensure status updates reactively when friend relationships change through proper query invalidation."
+        },
+        {
+          "path": "frontend/src/components/ChatThread.tsx",
+          "operation": "modify",
+          "description": "Add friend status indicator to the chat thread header next to the recipient's profile information. Use the same logic as ConversationList to determine status (friend/pending/non-friend) and display an appropriate badge or icon. Include quick action buttons (e.g., 'Send Friend Request' if not friends, 'Accept Request' if pending from them, 'Unfriend' if friends) for managing the relationship directly from the chat interface."
+        }
+      ]
+    },
+    {
+      "id": "REQ-59",
+      "summary": "Reduce video player size in VidlesPage by 40% to improve vertical video display",
+      "acceptanceCriteria": [
+        "Video player dimensions are reduced by 40% from current size",
+        "Vertical 9:16 videos display properly without excessive whitespace",
+        "Player maintains aspect ratio and remains centered",
+        "Engagement controls (like, comment, share) remain accessible and properly positioned",
+        "Responsive design works on both mobile and desktop"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/VidlesPage.tsx",
+          "operation": "modify",
+          "description": "Reduce the video player container dimensions by 40% (adjust max-width and max-height values in the video container styling). Ensure vertical 9:16 aspect ratio videos display properly centered with reduced whitespace. Maintain aspect ratio preservation for the video element. Verify engagement controls (like, comment, share buttons) remain accessible and properly positioned relative to the smaller player. Test responsive behavior on both mobile and desktop viewports to ensure the reduction works across screen sizes."
         }
       ]
     }

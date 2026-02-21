@@ -19,13 +19,13 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'success' : IDL.Opt(IDL.Bool),
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
+export const UserId = IDL.Principal;
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
 export const VideoId = IDL.Nat;
-export const UserId = IDL.Principal;
 export const Username = IDL.Text;
 export const ExternalBlob = IDL.Vec(IDL.Nat8);
 export const UserProfile = IDL.Record({
@@ -59,6 +59,17 @@ export const Video = IDL.Record({
   'uploader' : UserId,
   'uploadTime' : Time,
   'aspectRatio' : IDL.Float64,
+});
+export const FriendRequestStatus = IDL.Variant({
+  'pending' : IDL.Null,
+  'accepted' : IDL.Null,
+  'declined' : IDL.Null,
+});
+export const FriendRequest = IDL.Record({
+  'status' : FriendRequestStatus,
+  'recipient' : UserId,
+  'sender' : UserId,
+  'timestamp' : Time,
 });
 export const Comment = IDL.Record({
   'text' : IDL.Text,
@@ -94,14 +105,23 @@ export const idlService = IDL.Service({
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'acceptFriendRequest' : IDL.Func([UserId], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'commentOnVideo' : IDL.Func([VideoId, IDL.Text], [], []),
+  'declineFriendRequest' : IDL.Func([UserId], [], []),
+  'deleteVideo' : IDL.Func([VideoId], [], []),
   'followUser' : IDL.Func([UserId], [], []),
+  'getAcceptedFriendsList' : IDL.Func([], [IDL.Vec(UserId)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getConversationPartners' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
   'getMessagesWith' : IDL.Func([UserId], [IDL.Vec(Message)], ['query']),
   'getMostLikedVideos' : IDL.Func([], [IDL.Vec(Video)], ['query']),
+  'getPendingFriendRequests' : IDL.Func(
+      [],
+      [IDL.Vec(FriendRequest)],
+      ['query'],
+    ),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -114,8 +134,11 @@ export const idlService = IDL.Service({
   'likeVideo' : IDL.Func([VideoId], [], []),
   'register' : IDL.Func([IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'searchUsers' : IDL.Func([IDL.Text], [IDL.Vec(UserProfile)], ['query']),
+  'sendFriendRequest' : IDL.Func([UserId], [], []),
   'sendMessage' : IDL.Func([UserId, IDL.Text, IDL.Opt(IDL.Text)], [], []),
   'unfollowUser' : IDL.Func([UserId], [], []),
+  'unfriend' : IDL.Func([UserId], [], []),
   'uploadVideo' : IDL.Func(
       [
         IDL.Text,
@@ -145,13 +168,13 @@ export const idlFactory = ({ IDL }) => {
     'success' : IDL.Opt(IDL.Bool),
     'topped_up_amount' : IDL.Opt(IDL.Nat),
   });
+  const UserId = IDL.Principal;
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
   const VideoId = IDL.Nat;
-  const UserId = IDL.Principal;
   const Username = IDL.Text;
   const ExternalBlob = IDL.Vec(IDL.Nat8);
   const UserProfile = IDL.Record({
@@ -182,6 +205,17 @@ export const idlFactory = ({ IDL }) => {
     'uploader' : UserId,
     'uploadTime' : Time,
     'aspectRatio' : IDL.Float64,
+  });
+  const FriendRequestStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'accepted' : IDL.Null,
+    'declined' : IDL.Null,
+  });
+  const FriendRequest = IDL.Record({
+    'status' : FriendRequestStatus,
+    'recipient' : UserId,
+    'sender' : UserId,
+    'timestamp' : Time,
   });
   const Comment = IDL.Record({
     'text' : IDL.Text,
@@ -217,9 +251,13 @@ export const idlFactory = ({ IDL }) => {
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'acceptFriendRequest' : IDL.Func([UserId], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'commentOnVideo' : IDL.Func([VideoId, IDL.Text], [], []),
+    'declineFriendRequest' : IDL.Func([UserId], [], []),
+    'deleteVideo' : IDL.Func([VideoId], [], []),
     'followUser' : IDL.Func([UserId], [], []),
+    'getAcceptedFriendsList' : IDL.Func([], [IDL.Vec(UserId)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getConversationPartners' : IDL.Func(
@@ -229,6 +267,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getMessagesWith' : IDL.Func([UserId], [IDL.Vec(Message)], ['query']),
     'getMostLikedVideos' : IDL.Func([], [IDL.Vec(Video)], ['query']),
+    'getPendingFriendRequests' : IDL.Func(
+        [],
+        [IDL.Vec(FriendRequest)],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -241,8 +284,11 @@ export const idlFactory = ({ IDL }) => {
     'likeVideo' : IDL.Func([VideoId], [], []),
     'register' : IDL.Func([IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'searchUsers' : IDL.Func([IDL.Text], [IDL.Vec(UserProfile)], ['query']),
+    'sendFriendRequest' : IDL.Func([UserId], [], []),
     'sendMessage' : IDL.Func([UserId, IDL.Text, IDL.Opt(IDL.Text)], [], []),
     'unfollowUser' : IDL.Func([UserId], [], []),
+    'unfriend' : IDL.Func([UserId], [], []),
     'uploadVideo' : IDL.Func(
         [
           IDL.Text,

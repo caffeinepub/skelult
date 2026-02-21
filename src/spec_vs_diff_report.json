@@ -1,24 +1,40 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T09:32:07.006Z",
-  "summary": "The diff implements 3 of 4 requirements. REQ-40 (SkelUlt logo in Layout header) and REQ-41/42/43 (Enable/Disable follow button with animations) are implemented. However, the actual logo image file (skelult-logo.dim_200x60.png) is not present in the diff, creating an implementation gap.",
+  "generatedAt": "2026-02-21T10:19:28.184Z",
+  "summary": "The implementation covers the friend system backend (data model, functions, stable storage) and most frontend components (AddFriendsModal, FriendRequestsList, FriendsList, integration into MessagingPage, friend status indicators in ChatThread and ConversationList). However, the diff does not show evidence of the Vidles video player size reduction (REQ-59), and the AddFriendsModal has a noted limitation where the Principal is not available from search results, preventing the actual sending of friend requests.",
   "missing_requirements": [
     {
-      "id": "REQ-40",
-      "requirement": "Logo uses the generated image asset from frontend/public/assets/generated",
-      "reason": "The Layout.tsx component references /assets/generated/skelult-logo.dim_200x60.png, but the actual image file is not included in the diff. The BuildRequest explicitly requires 'Images required: SkelUlt logo... (skelult-logo.dim_200x60.png)' but no image file was added.",
+      "id": "REQ-59",
+      "requirement": "Reduce the video player size in VidlesPage.tsx by 40% to make vertical videos fit better on screen",
+      "reason": "The diff for VidlesPage.tsx does not show any changes to video player dimensions or sizing. The file shows only structural changes (imports, profile setup modal, empty states) but no modifications to video player size or styling.",
       "evidence": [
-        "frontend/src/components/Layout.tsx"
+        "frontend/src/pages/VidlesPage.tsx"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.92,
+  "hallucinated_features": [
+    {
+      "description": "Backend migration module for friend requests stable storage",
+      "reason": "The migration.mo file was added to handle data migration for the friend system, but there was no requirement requesting a migration system or stable storage migration logic. REQ-49 only requires that friend requests be stored in backend state with stable storage, not that a migration module be created.",
+      "evidence": [
+        "backend/migration.mo"
+      ]
+    }
+  ],
+  "confidence": 0.85,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/Layout.tsx",
-    "frontend/src/components/VideoCard.tsx",
+    "frontend/src/components/AddFriendsModal.tsx",
+    "frontend/src/components/ChatThread.tsx",
+    "frontend/src/components/ConversationList.tsx",
+    "frontend/src/components/FriendRequestsList.tsx",
+    "frontend/src/components/FriendsList.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/MessagingPage.tsx",
+    "frontend/src/pages/VidlesPage.tsx",
     "project_state.json"
   ]
 }

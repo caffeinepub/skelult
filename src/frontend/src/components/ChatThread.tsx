@@ -1,12 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { useGetMessagesWith, useGetUserProfile } from '../hooks/useQueries';
+import { useGetMessagesWith, useGetUserProfile, useGetFriendsList, useSendFriendRequest } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
 import type { Principal } from '@dfinity/principal';
+import { UserPlus, UserCheck } from 'lucide-react';
 
 interface ChatThreadProps {
   recipientId: Principal;
@@ -16,6 +19,8 @@ export default function ChatThread({ recipientId }: ChatThreadProps) {
   const { identity } = useInternetIdentity();
   const { data: messages, isLoading } = useGetMessagesWith(recipientId.toString());
   const { data: recipientProfile } = useGetUserProfile(recipientId.toString());
+  const { data: friends } = useGetFriendsList();
+  const sendFriendRequest = useSendFriendRequest();
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(0);
 
@@ -37,6 +42,11 @@ export default function ChatThread({ recipientId }: ChatThreadProps) {
   }
 
   const currentUserId = identity.getPrincipal().toString();
+  const isFriend = friends?.some(f => f.toString() === recipientId.toString());
+
+  const handleSendFriendRequest = () => {
+    sendFriendRequest.mutate(recipientId);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -51,12 +61,32 @@ export default function ChatThread({ recipientId }: ChatThreadProps) {
             <img src="/assets/generated/default-avatar.dim_200x200.png" alt="Avatar" />
           </AvatarFallback>
         </Avatar>
-        <div>
-          <h3 className="font-semibold">{recipientProfile?.username || 'Loading...'}</h3>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">{recipientProfile?.username || 'Loading...'}</h3>
+            {isFriend && (
+              <Badge variant="secondary" className="gap-1">
+                <UserCheck className="h-3 w-3" />
+                Friend
+              </Badge>
+            )}
+          </div>
           {recipientProfile?.bio && (
             <p className="text-sm text-muted-foreground truncate">{recipientProfile.bio}</p>
           )}
         </div>
+        {!isFriend && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleSendFriendRequest}
+            disabled={sendFriendRequest.isPending}
+            className="rounded-full"
+          >
+            <UserPlus className="h-4 w-4 mr-1" />
+            Add Friend
+          </Button>
+        )}
       </div>
 
       {/* Messages */}

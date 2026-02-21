@@ -62,10 +62,13 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('🗑️ Delete button clicked for video:', video.id.toString());
     setShowDeleteDialog(true);
+    console.log('📋 Delete dialog opened');
   };
 
   const handleConfirmDelete = () => {
+    console.log('✅ Delete confirmed for video:', video.id.toString());
     deleteVideo.mutate(video.id);
     setShowDeleteDialog(false);
   };
@@ -245,7 +248,11 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
                   className="flex items-center gap-2 text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50 ml-auto"
                   title="Delete video"
                 >
-                  <Trash2 className="h-5 w-5" />
+                  {deleteVideo.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-5 w-5" />
+                  )}
                 </button>
               )}
             </div>
@@ -254,7 +261,7 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
       </Card>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {isVidle ? 'Vidle' : 'Video'}</AlertDialogTitle>
             <AlertDialogDescription>
@@ -262,9 +269,17 @@ export default function VideoCard({ video, commentCount = 0 }: VideoCardProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={(e) => {
+              e.stopPropagation();
+              console.log('❌ Delete cancelled');
+            }}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleConfirmDelete}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleConfirmDelete();
+              }}
               className="bg-destructive hover:bg-destructive/90"
             >
               Delete

@@ -34,6 +34,12 @@ export interface Comment {
     timestamp: Time;
 }
 export type UserId = Principal;
+export interface FriendRequest {
+    status: FriendRequestStatus;
+    recipient: UserId;
+    sender: UserId;
+    timestamp: Time;
+}
 export type VideoId = bigint;
 export interface Message {
     content: string;
@@ -54,20 +60,30 @@ export enum ContentType {
     video = "video",
     vidle = "vidle"
 }
+export enum FriendRequestStatus {
+    pending = "pending",
+    accepted = "accepted",
+    declined = "declined"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
     guest = "guest"
 }
 export interface backendInterface {
+    acceptFriendRequest(sender: UserId): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     commentOnVideo(videoId: VideoId, text: string): Promise<void>;
+    declineFriendRequest(sender: UserId): Promise<void>;
+    deleteVideo(videoId: VideoId): Promise<void>;
     followUser(target: UserId): Promise<void>;
+    getAcceptedFriendsList(): Promise<Array<UserId>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getConversationPartners(): Promise<Array<Principal>>;
     getMessagesWith(otherUser: UserId): Promise<Array<Message>>;
     getMostLikedVideos(): Promise<Array<Video>>;
+    getPendingFriendRequests(): Promise<Array<FriendRequest>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUserVideos(userId: UserId): Promise<Array<Video>>;
     getVideo(id: VideoId): Promise<Video | null>;
@@ -76,7 +92,10 @@ export interface backendInterface {
     likeVideo(videoId: VideoId): Promise<void>;
     register(username: string, bio: string, profilePic: ExternalBlob | null): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    searchUsers(searchTerm: string): Promise<Array<UserProfile>>;
+    sendFriendRequest(recipient: UserId): Promise<void>;
     sendMessage(recipient: UserId, content: string, videoLink: string | null): Promise<void>;
     unfollowUser(target: UserId): Promise<void>;
+    unfriend(friend: UserId): Promise<void>;
     uploadVideo(title: string, description: string, tags: Array<string>, videoFile: ExternalBlob, contentType: ContentType, durationSeconds: bigint, aspectRatio: number): Promise<void>;
 }

@@ -18,6 +18,15 @@ export interface Comment {
 export type ContentType = { 'video' : null } |
   { 'vidle' : null };
 export type ExternalBlob = Uint8Array;
+export interface FriendRequest {
+  'status' : FriendRequestStatus,
+  'recipient' : UserId,
+  'sender' : UserId,
+  'timestamp' : Time,
+}
+export type FriendRequestStatus = { 'pending' : null } |
+  { 'accepted' : null } |
+  { 'declined' : null };
 export interface Message {
   'content' : string,
   'recipient' : UserId,
@@ -80,14 +89,19 @@ export interface _SERVICE {
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'acceptFriendRequest' : ActorMethod<[UserId], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'commentOnVideo' : ActorMethod<[VideoId, string], undefined>,
+  'declineFriendRequest' : ActorMethod<[UserId], undefined>,
+  'deleteVideo' : ActorMethod<[VideoId], undefined>,
   'followUser' : ActorMethod<[UserId], undefined>,
+  'getAcceptedFriendsList' : ActorMethod<[], Array<UserId>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getConversationPartners' : ActorMethod<[], Array<Principal>>,
   'getMessagesWith' : ActorMethod<[UserId], Array<Message>>,
   'getMostLikedVideos' : ActorMethod<[], Array<Video>>,
+  'getPendingFriendRequests' : ActorMethod<[], Array<FriendRequest>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getUserVideos' : ActorMethod<[UserId], Array<Video>>,
   'getVideo' : ActorMethod<[VideoId], [] | [Video]>,
@@ -96,8 +110,11 @@ export interface _SERVICE {
   'likeVideo' : ActorMethod<[VideoId], undefined>,
   'register' : ActorMethod<[string, string, [] | [ExternalBlob]], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'searchUsers' : ActorMethod<[string], Array<UserProfile>>,
+  'sendFriendRequest' : ActorMethod<[UserId], undefined>,
   'sendMessage' : ActorMethod<[UserId, string, [] | [string]], undefined>,
   'unfollowUser' : ActorMethod<[UserId], undefined>,
+  'unfriend' : ActorMethod<[UserId], undefined>,
   'uploadVideo' : ActorMethod<
     [string, string, Array<string>, ExternalBlob, ContentType, bigint, number],
     undefined

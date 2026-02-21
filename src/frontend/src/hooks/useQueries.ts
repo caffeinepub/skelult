@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { UserProfile, Video, Comment, Message, VideoId } from '../backend';
+import type { UserProfile, Video, Comment, Message, VideoId, FriendRequest } from '../backend';
 import { ExternalBlob, ContentType } from '../backend';
 import { Principal } from '@dfinity/principal';
 import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
 
 // User Profile Queries
 export function useGetCallerUserProfile() {
@@ -193,36 +194,72 @@ export function useUploadVideo() {
 }
 
 export function useDeleteVideo() {
+  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (videoId: VideoId) => {
-      // Note: Backend doesn't have delete functionality yet
-      // This is a placeholder for future implementation
-      throw new Error('Delete functionality not yet implemented in backend');
+      console.log('🗑️ Delete mutation started for video ID:', videoId.toString());
+      if (!actor) {
+        console.error('❌ Actor not available for delete');
+        throw new Error('Actor not available');
+      }
+      try {
+        console.log('🔄 Calling backend deleteVideo...');
+        await actor.deleteVideo(videoId);
+        console.log('✅ Backend deleteVideo call successful');
+      } catch (error) {
+        console.error('❌ Error deleting video:', error);
+        throw error;
+      }
     },
     onMutate: async (videoId) => {
-      // Optimistically remove from cache
+      console.log('⏳ Optimistically removing video from cache:', videoId.toString());
+      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['videos'] });
       
-      const previousVideos = queryClient.getQueryData(['videos', 'mostLiked']);
+      // Snapshot the previous values
+      const previousMostLiked = queryClient.getQueryData(['videos', 'mostLiked']);
+      const previousVidles = queryClient.getQueryData(['videos', 'vidles']);
       
+      // Optimistically update all video queries
       queryClient.setQueryData(['videos', 'mostLiked'], (old: Video[] | undefined) => {
         return old?.filter(v => v.id !== videoId) || [];
       });
 
-      return { previousVideos };
+      queryClient.setQueryData(['videos', 'vidles'], (old: Video[] | undefined) => {
+        return old?.filter(v => v.id !== videoId) || [];
+      });
+
+      // Also update user-specific video queries
+      const userQueries = queryClient.getQueriesData({ queryKey: ['videos', 'user'] });
+      userQueries.forEach(([queryKey, data]) => {
+        if (Array.isArray(data)) {
+          queryClient.setQueryData(queryKey, data.filter((v: Video) => v.id !== videoId));
+        }
+      });
+
+      return { previousMostLiked, previousVidles };
     },
     onError: (err, videoId, context) => {
+      console.error('❌ Delete mutation failed, rolling back:', err);
       // Rollback on error
-      if (context?.previousVideos) {
-        queryClient.setQueryData(['videos', 'mostLiked'], context.previousVideos);
+      if (context?.previousMostLiked) {
+        queryClient.setQueryData(['videos', 'mostLiked'], context.previousMostLiked);
       }
-      toast.error('Failed to delete video');
+      if (context?.previousVidles) {
+        queryClient.setQueryData(['videos', 'vidles'], context.previousVidles);
+      }
+      
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete video';
+      toast.error(errorMessage);
     },
-    onSuccess: () => {
+    onSuccess: (_, videoId) => {
+      console.log('✅ Delete mutation successful, invalidating queries');
       toast.success('Video deleted successfully');
+      // Invalidate all video-related queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ['videos'] });
+      queryClient.invalidateQueries({ queryKey: ['video', videoId.toString()] });
     },
   });
 }
@@ -398,6 +435,178 @@ export function useGetConversationPartners() {
     },
     enabled: !!actor && !isFetching,
     refetchInterval: 3000,
+    retry: 1,
+  });
+}
+
+// Friend System Queries
+export function useSendFriendRequest() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (recipient: Principal) => {
+      if (!actor) throw new Error('Actor not available');
+      try {
+        return await actor.sendFriendRequest(recipient);
+      } catch (error) {
+        console.error('Error sending friend request:', error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
+      toast.success('Friend request sent!');
+    },
+    onError: (error: any) => {
+      const message = error?.message || 'Failed to send friend request';
+      toast.error(message);
+    },
+  });
+}
+
+export function useAcceptFriendRequest() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (sender: Principal) => {
+      if (!actor) throw new Error('Actor not available');
+      try {
+        return await actor.acceptFriendRequest(sender);
+      } catch (error) {
+        console.error('Error accepting friend request:', error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
+      toast.success('Friend request accepted!');
+    },
+    onError: (error: any) => {
+      const message = error?.message || 'Failed to accept friend request';
+      toast.error(message);
+    },
+  });
+}
+
+export function useDeclineFriendRequest() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (sender: Principal) => {
+      if (!actor) throw new Error('Actor not available');
+      try {
+        return await actor.declineFriendRequest(sender);
+      } catch (error) {
+        console.error('Error declining friend request:', error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+      toast.success('Friend request declined');
+    },
+    onError: (error: any) => {
+      const message = error?.message || 'Failed to decline friend request';
+      toast.error(message);
+    },
+  });
+}
+
+export function useGetFriendRequests() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<FriendRequest[]>({
+    queryKey: ['friendRequests'],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        return await actor.getPendingFriendRequests();
+      } catch (error) {
+        console.error('Error fetching friend requests:', error);
+        return [];
+      }
+    },
+    enabled: !!actor && !isFetching,
+    refetchInterval: 5000,
+    retry: 1,
+  });
+}
+
+export function useGetFriendsList() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Principal[]>({
+    queryKey: ['friends'],
+    queryFn: async () => {
+      if (!actor) return [];
+      try {
+        return await actor.getAcceptedFriendsList();
+      } catch (error) {
+        console.error('Error fetching friends list:', error);
+        return [];
+      }
+    },
+    enabled: !!actor && !isFetching,
+    refetchInterval: 5000,
+    retry: 1,
+  });
+}
+
+export function useUnfriend() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (friend: Principal) => {
+      if (!actor) throw new Error('Actor not available');
+      try {
+        return await actor.unfriend(friend);
+      } catch (error) {
+        console.error('Error unfriending:', error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
+      toast.success('Friend removed');
+    },
+    onError: (error: any) => {
+      const message = error?.message || 'Failed to unfriend';
+      toast.error(message);
+    },
+  });
+}
+
+export function useSearchUsers(searchTerm: string) {
+  const { actor, isFetching } = useActor();
+  const [debouncedTerm, setDebouncedTerm] = useState(searchTerm);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  return useQuery<UserProfile[]>({
+    queryKey: ['searchUsers', debouncedTerm],
+    queryFn: async () => {
+      if (!actor) return [];
+      if (!debouncedTerm || debouncedTerm.trim().length === 0) return [];
+      try {
+        return await actor.searchUsers(debouncedTerm);
+      } catch (error) {
+        console.error('Error searching users:', error);
+        return [];
+      }
+    },
+    enabled: !!actor && !isFetching && debouncedTerm.trim().length > 0,
     retry: 1,
   });
 }

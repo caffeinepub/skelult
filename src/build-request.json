@@ -1,104 +1,287 @@
 {
   "kind": "build_request",
-  "title": "Add SkelUlt logo and Enable/Disable follow button with animation",
+  "title": "Implement friend system for SkelMsg with user search and reduce Vidles player size",
   "projectName": "SkelUlt",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-40",
-      "text": "Add the SkelUlt logo (bold geometric text with cyan 'ULT' accent) to the top-left corner of the Layout component header, ensuring it is small in size and displays consistently in both light and dark modes",
-      "target": "frontend",
+      "id": "REQ-49",
+      "text": "Add friend request data model to backend/main.mo with fields for sender Principal, recipient Principal, status (pending/accepted/declined), and timestamp",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-10",
-          "msg-11"
-        ],
-        "quotes": [
-          "add the logo right now at top left, it should be small but same in light or dark mode"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Logo appears in the top-left corner of the Layout header",
-        "Logo is small and does not overwhelm other header elements",
-        "Logo displays with consistent styling in both light and dark theme modes",
-        "Logo uses the generated image asset from frontend/public/assets/generated"
-      ]
-    },
-    {
-      "id": "REQ-41",
-      "text": "Add an Enable button next to the like button on all videos in VideoCard component that allows users to follow/subscribe to the video creator's channel",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
+          "msg-1",
+          "msg-2",
+          "msg-3",
+          "msg-4",
+          "msg-5",
+          "msg-6",
+          "msg-7",
+          "msg-8",
           "msg-9",
+          "msg-10",
+          "msg-11",
           "msg-12"
-        ],
-        "quotes": [
-          "add \"Enable\" button which is same as follow/subscribe button, this should appear next to the like button",
-          "\"Enable\" button should have animation after clicking, turning into \"disable\" from which people can unfollow/unsubscribe the channel"
         ]
       },
       "acceptanceCriteria": [
-        "Enable button appears next to the like button on all video cards",
-        "Button text displays 'Enable' when the user is not following the video creator",
-        "Clicking the Enable button follows/subscribes to the video creator",
-        "Button smoothly animates and transitions to 'Disable' state after clicking"
+        "FriendRequest type includes sender, recipient, status enum, and timestamp fields",
+        "Friend requests are stored in backend state with stable storage"
       ]
     },
     {
-      "id": "REQ-42",
-      "text": "Implement smooth animation for the Enable/Disable button that transforms the button state from 'Enable' to 'Disable' on click with visual transition effects",
-      "target": "frontend",
+      "id": "REQ-50",
+      "text": "Implement backend functions to send friend requests, accept friend requests, decline friend requests, get pending friend requests, get accepted friends list, and unfriend (remove friendship)",
+      "target": "backend",
       "source": {
         "messageIds": [
+          "msg-1",
+          "msg-2",
+          "msg-3",
+          "msg-4",
+          "msg-5",
+          "msg-6",
+          "msg-7",
+          "msg-8",
+          "msg-9",
+          "msg-10",
+          "msg-11",
           "msg-12"
-        ],
-        "quotes": [
-          "\"Enable\" button should have animation after clicking, turning into \"disable\""
         ]
       },
       "acceptanceCriteria": [
-        "Button smoothly animates when transitioning between Enable and Disable states",
-        "Visual transition effects are consistent with the neon-inspired design theme",
-        "Animation completes within a reasonable timeframe (300-500ms)",
-        "Button remains interactive and responsive during and after animation"
+        "sendFriendRequest function creates a pending friend request between two users",
+        "acceptFriendRequest function changes status from pending to accepted",
+        "declineFriendRequest function changes status to declined or removes the request",
+        "getFriendRequests function returns all pending requests for the authenticated user",
+        "getFriendsList function returns all accepted friends for the authenticated user",
+        "unfriend function removes the friendship connection between two users"
       ]
     },
     {
-      "id": "REQ-43",
-      "text": "Implement Disable button functionality that allows users to unfollow/unsubscribe from the video creator's channel when clicked in the Disable state",
-      "target": "frontend",
+      "id": "REQ-51",
+      "text": "Add backend searchUsers function that searches all registered users by username and returns matching user profiles with Principal ID, username, profile picture, and bio",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-12"
-        ],
-        "quotes": [
-          "turning into \"disable\" from which people can unfollow/unsubscribe the channel"
+          "msg-1",
+          "msg-2",
+          "msg-3",
+          "msg-4"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking the Disable button unfollows/unsubscribes from the video creator",
-        "Button smoothly animates back to 'Enable' state after unfollowing",
-        "Follow/unfollow action updates the user's follow list immediately (optimistic UI)",
-        "Follow state persists correctly after page refresh"
+        "searchUsers function accepts a username search query string",
+        "Function returns users whose usernames contain the search query (case-insensitive)",
+        "Results include user Principal, username, profile picture URL, and bio",
+        "Empty search query returns empty results"
+      ]
+    },
+    {
+      "id": "REQ-52",
+      "text": "Create React Query hooks in useQueries.ts for friend system operations: useSendFriendRequest, useAcceptFriendRequest, useDeclineFriendRequest, useGetFriendRequests, useGetFriendsList, useUnfriend, and useSearchUsers",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-2",
+          "msg-3",
+          "msg-4",
+          "msg-5",
+          "msg-6",
+          "msg-7",
+          "msg-8",
+          "msg-9",
+          "msg-10",
+          "msg-11",
+          "msg-12"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All hooks follow existing React Query patterns in useQueries.ts",
+        "Mutation hooks include optimistic updates and cache invalidation",
+        "Search hook includes debouncing for performance",
+        "Hooks include proper error handling and loading states"
+      ]
+    },
+    {
+      "id": "REQ-53",
+      "text": "Add 'Add Friends' button to the MessagingPage component that opens a modal dialog with a search bar to find users by username",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-2",
+          "msg-3",
+          "msg-4"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Add Friends button is positioned prominently in the MessagingPage UI",
+        "Clicking the button opens a modal dialog component",
+        "Modal includes a search input field at the top",
+        "Modal can be closed via X button or clicking outside"
+      ]
+    },
+    {
+      "id": "REQ-54",
+      "text": "Create AddFriendsModal component that displays a search bar and shows search results with user avatars, usernames, and 'Send Request' buttons for each user",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-2",
+          "msg-3",
+          "msg-4"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Search bar accepts text input and triggers search on typing",
+        "Search results display below the search bar in a scrollable list",
+        "Each result shows user profile picture, username, and 'Send Request' button",
+        "Send Request button becomes disabled after sending with 'Request Sent' label",
+        "Empty search shows a helpful message",
+        "Loading state displays while searching"
+      ]
+    },
+    {
+      "id": "REQ-55",
+      "text": "Create FriendRequestsList component that displays pending friend requests with accept and decline buttons for each request",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-6",
+          "msg-7",
+          "msg-8",
+          "msg-9",
+          "msg-10",
+          "msg-11",
+          "msg-12"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Component displays all pending friend requests for the authenticated user",
+        "Each request shows sender's profile picture and username",
+        "Accept button changes request status to accepted",
+        "Decline button removes or marks request as declined",
+        "List updates in real-time after accepting/declining",
+        "Empty state message displays when no pending requests exist"
+      ]
+    },
+    {
+      "id": "REQ-56",
+      "text": "Create FriendsList component that displays all accepted friends with profile pictures, usernames, and unfriend buttons",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-6",
+          "msg-7",
+          "msg-8",
+          "msg-9",
+          "msg-10",
+          "msg-11",
+          "msg-12"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Component displays all accepted friends for the authenticated user",
+        "Each friend shows profile picture and username",
+        "Unfriend button removes the friendship connection",
+        "Confirmation dialog appears before unfriending",
+        "List updates after unfriending",
+        "Empty state message displays when no friends exist"
+      ]
+    },
+    {
+      "id": "REQ-57",
+      "text": "Integrate FriendRequestsList and FriendsList components into the MessagingPage layout, displaying them alongside the conversation list",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-6",
+          "msg-7",
+          "msg-8",
+          "msg-9",
+          "msg-10",
+          "msg-11",
+          "msg-12"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Friend requests section appears above or within the messaging interface",
+        "Friends list is accessible from the messaging interface",
+        "Layout maintains responsive design on mobile and desktop",
+        "Components integrate seamlessly with existing neon-themed UI"
+      ]
+    },
+    {
+      "id": "REQ-58",
+      "text": "Add friend status indicators to the messaging interface showing whether a conversation partner is a friend, has a pending request, or is not a friend",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-6",
+          "msg-7",
+          "msg-8",
+          "msg-9",
+          "msg-10",
+          "msg-11",
+          "msg-12"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Conversation list shows friend status badge for each conversation partner",
+        "Chat thread header displays friend status",
+        "Visual indicator distinguishes between friend, pending, and non-friend statuses",
+        "Status updates in real-time when friend status changes"
+      ]
+    },
+    {
+      "id": "REQ-59",
+      "text": "Reduce the video player size in VidlesPage.tsx by 40% to make vertical videos fit better on screen",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-6",
+          "msg-7",
+          "msg-8",
+          "msg-9",
+          "msg-10",
+          "msg-11",
+          "msg-12"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Video player dimensions are reduced by 40% from current size",
+        "Vertical 9:16 videos display properly without excessive whitespace",
+        "Player maintains aspect ratio and remains centered",
+        "Engagement controls (like, comment, share) remain accessible and properly positioned",
+        "Responsive design works on both mobile and desktop"
       ]
     }
   ],
   "constraints": [
-    "Do not modify backend schema or main.mo actor file",
-    "Use existing follow system infrastructure from FollowButton component",
-    "Do not edit immutable frontend paths: useInternetIdentity.ts, useActor.ts, main.tsx, frontend/src/components/ui"
+    "Do not modify immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui",
+    "Maintain single-actor architecture in backend/main.mo",
+    "Follow existing React Query patterns and caching strategies in useQueries.ts",
+    "Preserve neon-themed UI design system with OKLCH colors",
+    "Friend system must integrate with existing messaging interface without breaking current functionality"
   ],
   "nonGoals": [
-    "Creating a new follow system separate from the existing one",
-    "Modifying backend follow/unfollow logic",
-    "Adding notification features for follows",
-    "Implementing analytics or tracking for button interactions"
+    "Real-time WebSocket notifications for friend requests (use polling instead)",
+    "Friend recommendation algorithms",
+    "Mutual friend display or social graph visualizations",
+    "Friend groups or categorization features",
+    "Blocking or privacy controls beyond unfriending",
+    "Friend activity feeds or status updates"
   ],
   "imageRequirements": {
-    "required": [
-      "SkelUlt logo with bold geometric text featuring dark gray 'SKEL' letters and cyan 'ULT' accent on transparent background, optimized for header display (skelult-logo.dim_200x60.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

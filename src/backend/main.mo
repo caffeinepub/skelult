@@ -1,27 +1,24 @@
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Map "mo:core/Map";
-import Time "mo:core/Time";
+import Nat "mo:core/Nat";
 import Order "mo:core/Order";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
-import Nat "mo:core/Nat";
+import Time "mo:core/Time";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
+import Migration "migration";
 
-
-
+(with migration = Migration.run)
 actor {
-  // Mix in Storage for file handling
   include MixinStorage();
 
-  // Prepare Authorization
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // Types
   type UserId = Principal;
   type Username = Text;
   type VideoId = Nat;
@@ -34,16 +31,10 @@ actor {
     following : Nat;
   };
 
-  // Video Content Type
   public type ContentType = {
     #video;
     #vidle;
   };
-
-  // Constants for validation
-  let MIN_VIDLE_DURATION_SECONDS = 5;
-  let MAX_VIDLE_DURATION_SECONDS = 150; // 2 minutes 30 seconds in seconds
-  let VIDLE_ASPECT_RATIO = 0.5625; // 9:16 aspect ratio as decimal
 
   public type Video = {
     id : VideoId;
@@ -71,7 +62,6 @@ actor {
     };
   };
 
-  // State
   var nextVideoId = 0;
 
   let profiles = Map.empty<UserId, UserProfile>();
@@ -81,14 +71,40 @@ actor {
   let videoLikesMap = Map.empty<VideoId, List.List<UserId>>();
   let videoCommentsMap = Map.empty<VideoId, List.List<Comment>>();
 
-  // Helper function to check user registration
   func ensureRegistered(caller : UserId) {
     if (not profiles.containsKey(caller)) {
       Runtime.trap("User is not registered");
     };
   };
 
-  // Required Profile Functions
+  let MIN_VIDLE_DURATION_SECONDS = 5;
+  let MAX_VIDLE_DURATION_SECONDS = 150;
+  let VIDLE_ASPECT_RATIO = 0.5625;
+
+  public type FriendRequestStatus = {
+    #pending;
+    #accepted;
+    #declined;
+  };
+
+  public type FriendRequest = {
+    sender : UserId;
+    recipient : UserId;
+    status : FriendRequestStatus;
+    timestamp : Time.Time;
+  };
+
+  type FriendRequestKey = {
+    sender : UserId;
+    recipient : UserId;
+  };
+
+  let friendRequests = Map.empty<Text, FriendRequest>();
+
+  func makeFriendRequestKey(sender : UserId, recipient : UserId) : Text {
+    sender.toText() # ":" # recipient.toText();
+  };
+
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view their profile");
@@ -110,7 +126,198 @@ actor {
     profiles.add(caller, profile);
   };
 
-  // User Registration/Login
+  public shared ({ caller }) func sendFriendRequest(recipient : UserId) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can send friend requests");
+    };
+
+    ensureRegistered(caller);
+
+    if (not profiles.containsKey(recipient)) {
+      Runtime.trap("Recipient user does not exist");
+    };
+
+    if (caller == recipient) {
+      Runtime.trap("Cannot send friend request to yourself");
+    };
+
+    let key = makeFriendRequestKey(caller, recipient);
+    
+    switch (friendRequests.get(key)) {
+      case (?existing) {
+        if (existing.status == #pending) {
+          Runtime.trap("Friend request already pending");
+        };
+        if (existing.status == #accepted) {
+          Runtime.trap("Already friends with this user");
+        };
+      };
+      case (null) {};
+    };
+
+    let reverseKey = makeFriendRequestKey(recipient, caller);
+    switch (friendRequests.get(reverseKey)) {
+      case (?existing) {
+        if (existing.status == #accepted) {
+          Runtime.trap("Already friends with this user");
+        };
+      };
+      case (null) {};
+    };
+
+    let newRequest : FriendRequest = {
+      sender = caller;
+      recipient;
+      status = #pending;
+      timestamp = Time.now();
+    };
+
+    friendRequests.add(key, newRequest);
+  };
+
+  public shared ({ caller }) func acceptFriendRequest(sender : UserId) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can accept friend requests");
+    };
+
+    ensureRegistered(caller);
+
+    let key = makeFriendRequestKey(sender, caller);
+    
+    switch (friendRequests.get(key)) {
+      case (null) {
+        Runtime.trap("No friend request from this sender");
+      };
+      case (?request) {
+        if (request.status != #pending) {
+          Runtime.trap("Friend request is not pending");
+        };
+        
+        let updatedRequest = {
+          request with status = #accepted
+        };
+        friendRequests.add(key, updatedRequest);
+      };
+    };
+  };
+
+  public shared ({ caller }) func declineFriendRequest(sender : UserId) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can decline friend requests");
+    };
+
+    ensureRegistered(caller);
+
+    let key = makeFriendRequestKey(sender, caller);
+    
+    switch (friendRequests.get(key)) {
+      case (null) {
+        Runtime.trap("No friend request from this sender");
+      };
+      case (?request) {
+        if (request.status != #pending) {
+          Runtime.trap("Friend request is not pending");
+        };
+        
+        let updatedRequest = {
+          request with status = #declined
+        };
+        friendRequests.add(key, updatedRequest);
+      };
+    };
+  };
+
+  public query ({ caller }) func getPendingFriendRequests() : async [FriendRequest] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can get pending friend requests");
+    };
+
+    ensureRegistered(caller);
+
+    let pendingRequests = List.empty<FriendRequest>();
+    for ((_, request) in friendRequests.entries()) {
+      if (request.recipient == caller and request.status == #pending) {
+        pendingRequests.add(request);
+      };
+    };
+    pendingRequests.toArray();
+  };
+
+  public query ({ caller }) func getAcceptedFriendsList() : async [UserId] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can get friends list");
+    };
+
+    ensureRegistered(caller);
+
+    let friends = List.empty<UserId>();
+    for ((_, request) in friendRequests.entries()) {
+      if (request.status == #accepted) {
+        if (request.sender == caller) {
+          friends.add(request.recipient);
+        } else if (request.recipient == caller) {
+          friends.add(request.sender);
+        };
+      };
+    };
+    friends.toArray();
+  };
+
+  public shared ({ caller }) func unfriend(friend : UserId) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can unfriend");
+    };
+
+    ensureRegistered(caller);
+
+    if (caller == friend) {
+      Runtime.trap("Cannot unfriend yourself");
+    };
+
+    let key1 = makeFriendRequestKey(caller, friend);
+    let key2 = makeFriendRequestKey(friend, caller);
+
+    var found = false;
+
+    switch (friendRequests.get(key1)) {
+      case (?request) {
+        if (request.status == #accepted) {
+          friendRequests.remove(key1);
+          found := true;
+        };
+      };
+      case (null) {};
+    };
+
+    switch (friendRequests.get(key2)) {
+      case (?request) {
+        if (request.status == #accepted) {
+          friendRequests.remove(key2);
+          found := true;
+        };
+      };
+      case (null) {};
+    };
+
+    if (not found) {
+      Runtime.trap("Not friends with this user");
+    };
+  };
+
+  public query ({ caller }) func searchUsers(searchTerm : Text) : async [UserProfile] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can search for other users");
+    };
+
+    if (searchTerm.size() == 0) { return [] };
+    
+    profiles.values().toArray().filter(
+      func(profile) {
+        profile.username.contains(#text searchTerm) or profile.bio.contains(#text searchTerm);
+      }
+    );
+  };
+
   public shared ({ caller }) func register(username : Text, bio : Text, profilePic : ?Storage.ExternalBlob) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can register");
@@ -131,7 +338,6 @@ actor {
     profiles.add(caller, profile);
   };
 
-  // Upload Video with Validation for Vidles
   public shared ({ caller }) func uploadVideo(
     title : Text,
     description : Text,
@@ -147,7 +353,6 @@ actor {
 
     ensureRegistered(caller);
 
-    // Validate Vidle specific requirements
     switch (contentType) {
       case (#vidle) {
         validateVidleDuration(durationSeconds);
@@ -174,7 +379,6 @@ actor {
     nextVideoId += 1;
   };
 
-  // Function to validate Vidle duration
   func validateVidleDuration(durationSeconds : Nat) {
     if (durationSeconds < MIN_VIDLE_DURATION_SECONDS) {
       Runtime.trap("Vidle duration must be at least 5 seconds");
@@ -183,20 +387,17 @@ actor {
     };
   };
 
-  // Function to validate Vidle aspect ratio
   func validateVidleAspectRatio(aspectRatio : Float) {
-    let tolerance : Float = 0.025; // Allow small tolerance for aspect ratio validation
+    let tolerance : Float = 0.025;
     if (aspectRatio < VIDLE_ASPECT_RATIO - tolerance or aspectRatio > VIDLE_ASPECT_RATIO + tolerance) {
       Runtime.trap("Vidle must have a 9:16 vertical aspect ratio");
     };
   };
 
-  // Get Video by ID - Public query, anyone can view
   public query ({ caller }) func getVideo(id : VideoId) : async ?Video {
     videos.get(id);
   };
 
-  // Like Video
   public shared ({ caller }) func likeVideo(videoId : VideoId) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can like videos");
@@ -210,26 +411,35 @@ actor {
     };
 
     let currentLikes = switch (videoLikesMap.get(videoId)) {
-      case (null) { List.empty<UserId>() };
+      case (null) {
+        let newList = List.empty<UserId>();
+        newList.add(caller);
+        videoLikesMap.add(videoId, newList);
+        newList;
+      };
       case (?likes) {
         if (likes.contains(caller)) {
           Runtime.trap("User has already liked this video");
         };
         likes.add(caller);
+        videoLikesMap.add(videoId, likes);
         likes;
       };
     };
-    videoLikesMap.add(videoId, currentLikes);
+    
     videos.add(videoId, { video with likes = video.likes + 1 });
   };
 
-  // Comment on Video
   public shared ({ caller }) func commentOnVideo(videoId : VideoId, text : Text) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can comment on videos");
     };
 
     ensureRegistered(caller);
+
+    if (not videos.containsKey(videoId)) {
+      Runtime.trap("Video does not exist");
+    };
 
     if (text.size() == 0) {
       Runtime.trap("Comment cannot be empty");
@@ -242,16 +452,20 @@ actor {
     };
 
     let currentComments = switch (videoCommentsMap.get(videoId)) {
-      case (null) { List.empty<Comment>() };
+      case (null) {
+        let newList = List.empty<Comment>();
+        newList.add(newComment);
+        videoCommentsMap.add(videoId, newList);
+        newList;
+      };
       case (?c) {
         c.add(newComment);
+        videoCommentsMap.add(videoId, c);
         c;
       };
     };
-    videoCommentsMap.add(videoId, currentComments);
   };
 
-  // Follow User
   public shared ({ caller }) func followUser(target : UserId) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can follow other users");
@@ -259,30 +473,44 @@ actor {
 
     ensureRegistered(caller);
 
+    if (not profiles.containsKey(target)) {
+      Runtime.trap("Target user does not exist");
+    };
+
     if (caller == target) {
       Runtime.trap("Cannot follow yourself");
     };
 
     let followers = switch (followersMap.get(target)) {
-      case (null) { List.empty<UserId>() };
+      case (null) {
+        let newList = List.empty<UserId>();
+        newList.add(caller);
+        followersMap.add(target, newList);
+        newList;
+      };
       case (?f) {
         if (f.contains(caller)) {
           Runtime.trap("Already following this user");
         };
         f.add(caller);
+        followersMap.add(target, f);
         f;
       };
     };
-    followersMap.add(target, followers);
 
     let followings = switch (followingMap.get(caller)) {
-      case (null) { List.empty<UserId>() };
+      case (null) {
+        let newList = List.empty<UserId>();
+        newList.add(target);
+        followingMap.add(caller, newList);
+        newList;
+      };
       case (?f) {
         f.add(target);
+        followingMap.add(caller, f);
         f;
       };
     };
-    followingMap.add(caller, followings);
 
     let targetProfile = switch (profiles.get(target)) {
       case (null) { Runtime.trap("Target user does not exist") };
@@ -297,7 +525,6 @@ actor {
     profiles.add(caller, { callerProfile with following = callerProfile.following + 1 });
   };
 
-  // Unfollow User
   public shared ({ caller }) func unfollowUser(target : UserId) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can unfollow other users");
@@ -305,21 +532,34 @@ actor {
 
     ensureRegistered(caller);
 
+    if (not profiles.containsKey(target)) {
+      Runtime.trap("Target user does not exist");
+    };
+
     if (caller == target) {
       Runtime.trap("Cannot unfollow yourself");
     };
 
     let followers = switch (followersMap.get(target)) {
-      case (null) { List.empty<UserId>() };
-      case (?f) { f.filter(func(followee) { followee != caller }) };
+      case (null) { Runtime.trap("Not following this user") };
+      case (?f) {
+        if (not f.contains(caller)) {
+          Runtime.trap("Not following this user");
+        };
+        let filtered = f.filter(func(followee) { followee != caller });
+        followersMap.add(target, filtered);
+        filtered;
+      };
     };
-    followersMap.add(target, followers);
 
     let followings = switch (followingMap.get(caller)) {
       case (null) { List.empty<UserId>() };
-      case (?f) { f.filter(func(follower) { follower != target }) };
+      case (?f) {
+        let filtered = f.filter(func(follower) { follower != target });
+        followingMap.add(caller, filtered);
+        filtered;
+      };
     };
-    followingMap.add(caller, followings);
 
     let targetProfile = switch (profiles.get(target)) {
       case (null) { Runtime.trap("Target user does not exist") };
@@ -334,17 +574,14 @@ actor {
     profiles.add(caller, { callerProfile with following = callerProfile.following - 1 : Nat });
   };
 
-  // Get User Videos - Public query, anyone can view
   public query ({ caller }) func getUserVideos(userId : UserId) : async [Video] {
     videos.values().toArray().filter(func(video) { video.uploader == userId });
   };
 
-  // Get Most Liked Videos - Public query, anyone can view
   public query ({ caller }) func getMostLikedVideos() : async [Video] {
     videos.values().toArray().sort(Video.compareByLikes);
   };
 
-  // Get Comment Section for a Video - Public query, anyone can view
   public query ({ caller }) func getVideoComments(videoId : VideoId) : async [Comment] {
     switch (videoCommentsMap.get(videoId)) {
       case (null) { [] };
@@ -352,7 +589,6 @@ actor {
     };
   };
 
-  // Messaging System
   public type Message = {
     sender : UserId;
     recipient : UserId;
@@ -363,13 +599,16 @@ actor {
 
   let messages = List.empty<Message>();
 
-  // Send Message - Only authenticated users can send messages
   public shared ({ caller }) func sendMessage(recipient : UserId, content : Text, videoLink : ?Text) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only registered users can send messages");
     };
 
     ensureRegistered(caller);
+
+    if (not profiles.containsKey(recipient)) {
+      Runtime.trap("Recipient user does not exist");
+    };
 
     if (content.size() == 0) {
       Runtime.trap("Message content cannot be empty");
@@ -390,11 +629,12 @@ actor {
     messages.add(message);
   };
 
-  // Get Messages Between Users - Only participants can view their conversation
   public query ({ caller }) func getMessagesWith(otherUser : UserId) : async [Message] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only registered users can view messages");
     };
+
+    ensureRegistered(caller);
 
     messages.values().toArray().filter(
       func(message : Message) : Bool {
@@ -404,13 +644,13 @@ actor {
     );
   };
 
-  // Get Conversation Partners - Returns unique array of user Principals who have conversed with caller
   public query ({ caller }) func getConversationPartners() : async [Principal] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only registered users can get conversation partners");
     };
 
-    // Collect all unique partners
+    ensureRegistered(caller);
+
     let partnersMap = Map.empty<Principal, Bool>();
 
     for (message in messages.values()) {
@@ -422,5 +662,18 @@ actor {
     };
 
     partnersMap.keys().toArray();
+  };
+
+  public shared ({ caller }) func deleteVideo(videoId : VideoId) : async () {
+    let video = switch (videos.get(videoId)) {
+      case (null) { Runtime.trap("Video does not exist") };
+      case (?v) { v };
+    };
+    
+    if (not (AccessControl.isAdmin(accessControlState, caller)) and caller != video.uploader) {
+      Runtime.trap("Unauthorized: Only admins or video owners can delete videos");
+    };
+    
+    videos.remove(videoId);
   };
 };

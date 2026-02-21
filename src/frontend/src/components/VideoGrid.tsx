@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Play, Trash2 } from 'lucide-react';
+import { Play, Trash2, Loader2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,10 +56,13 @@ function VideoGridItem({ video }: { video: Video }) {
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('🗑️ Grid delete button clicked for video:', video.id.toString());
     setShowDeleteDialog(true);
+    console.log('📋 Grid delete dialog opened');
   };
 
   const handleConfirmDelete = () => {
+    console.log('✅ Grid delete confirmed for video:', video.id.toString());
     deleteVideo.mutate(video.id);
     setShowDeleteDialog(false);
   };
@@ -94,7 +97,11 @@ function VideoGridItem({ video }: { video: Video }) {
             className="absolute top-2 right-2 z-10 bg-destructive/90 hover:bg-destructive text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
             title="Delete video"
           >
-            <Trash2 className="h-4 w-4" />
+            {deleteVideo.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
           </button>
         )}
 
@@ -114,7 +121,7 @@ function VideoGridItem({ video }: { video: Video }) {
       </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {isVidle ? 'Vidle' : 'Video'}</AlertDialogTitle>
             <AlertDialogDescription>
@@ -122,9 +129,17 @@ function VideoGridItem({ video }: { video: Video }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={(e) => {
+              e.stopPropagation();
+              console.log('❌ Grid delete cancelled');
+            }}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleConfirmDelete}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleConfirmDelete();
+              }}
               className="bg-destructive hover:bg-destructive/90"
             >
               Delete

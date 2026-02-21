@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 15,
+  "projectStateVersion": 19,
   "summary": "SkelUlt: A unified social media video platform combining features from Instagram, TikTok, YouTube, Facebook, and X for video posting and sharing",
   "architectural_notes": [
     "Multi-platform video hosting combining Instagram/TikTok/YouTube/Facebook/X features",
@@ -11,13 +11,15 @@
     "SkelMsg is an integrated feature within SkelUlt, not a separate application",
     "Vidles feature requires separate upload flow with aspect ratio (9:16) and duration validation (5s-150s)",
     "Enable/Disable button uses existing follow system backend but provides clearer UI pattern next to engagement buttons",
-    "SkelUlt logo image asset needs to be accessible in both light and dark theme contexts"
+    "SkelUlt logo image asset needs to be accessible in both light and dark theme contexts",
+    "Friend system integrated into SkelMsg requires user search functionality and friend request management (pending/accepted states)"
   ],
   "known_issues": [
-    "White screen issue after Version 5 deployment - site not rendering content properly"
+    "White screen issue after Version 5 deployment - site not rendering content properly",
+    "Delete button (trash icon) on videos not functioning when clicked - users unable to delete their own videos despite confirmation dialog implementation",
+    "Video/Vidle deletion incorrectly removes both content types when they should be independent (user reported deleting a video also deleted a vidle)"
   ],
-  "isFixRequest": true,
-  "imageRequirements": "## Required Images\n- SkelUlt logo with bold geometric text featuring dark gray 'SKEL' letters and cyan 'ULT' accent on transparent background, optimized for header display (skelult-logo.dim_200x60.png)",
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-implement-user-authentication-system-using-internet-identity-to-allow-users-to-sign-up-log-in-and-manage-their-accounts",
@@ -306,6 +308,102 @@
         "REQ-43"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-debug-and-fix-the-delete-button-click-handler-in-videocard-component-to-ensure-the-confirmation-dialog-appears-when-the-trash-icon-is-clicked-on-user-s-own-videos",
+      "title": "Debug and fix the delete button click handler in VideoCard component to ensure the confirmation dialog appears when the trash icon is clicked on user's own videos",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-debug-and-fix-the-delete-button-click-handler-in-videogrid-component-to-ensure-the-confirmation-dialog-appears-when-the-trash-icon-is-clicked-on-user-s-own-video-thumbnails",
+      "title": "Debug and fix the delete button click handler in VideoGrid component to ensure the confirmation dialog appears when the trash icon is clicked on user's own video thumbnails",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-usedeletevideo-mutation-hook-in-usequeries-ts-to-ensure-proper-error-handling-and-cache-invalidation-after-successful-video-deletion",
+      "title": "Fix the useDeleteVideo mutation hook in useQueries.ts to ensure proper error handling and cache invalidation after successful video deletion",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-console-logging-to-the-delete-button-click-handlers-and-mutation-calls-to-help-diagnose-any-remaining-issues-with-the-delete-functionality",
+      "title": "Add console logging to the delete button click handlers and mutation calls to help diagnose any remaining issues with the delete functionality",
+      "reqIds": [
+        "REQ-48"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-react-query-hooks-in-usequeries-ts-for-friend-system-operations-usesendfriendrequest-useacceptfriendrequest-usedeclinefriendrequest-usegetfriendrequests-usegetfriendslist-useunfriend-and-usesearchusers",
+      "title": "Create React Query hooks in useQueries.ts for friend system operations: useSendFriendRequest, useAcceptFriendRequest, useDeclineFriendRequest, useGetFriendRequests, useGetFriendsList, useUnfriend, and useSearchUsers",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-add-friends-button-to-the-messagingpage-component-that-opens-a-modal-dialog-with-a-search-bar-to-find-users-by-username",
+      "title": "Add 'Add Friends' button to the MessagingPage component that opens a modal dialog with a search bar to find users by username",
+      "reqIds": [
+        "REQ-53"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-addfriendsmodal-component-that-displays-a-search-bar-and-shows-search-results-with-user-avatars-usernames-and-send-request-buttons-for-each-user",
+      "title": "Create AddFriendsModal component that displays a search bar and shows search results with user avatars, usernames, and 'Send Request' buttons for each user",
+      "reqIds": [
+        "REQ-54"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-friendrequestslist-component-that-displays-pending-friend-requests-with-accept-and-decline-buttons-for-each-request",
+      "title": "Create FriendRequestsList component that displays pending friend requests with accept and decline buttons for each request",
+      "reqIds": [
+        "REQ-55"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-friendslist-component-that-displays-all-accepted-friends-with-profile-pictures-usernames-and-unfriend-buttons",
+      "title": "Create FriendsList component that displays all accepted friends with profile pictures, usernames, and unfriend buttons",
+      "reqIds": [
+        "REQ-56"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-friendrequestslist-and-friendslist-components-into-the-messagingpage-layout-displaying-them-alongside-the-conversation-list",
+      "title": "Integrate FriendRequestsList and FriendsList components into the MessagingPage layout, displaying them alongside the conversation list",
+      "reqIds": [
+        "REQ-57"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-friend-status-indicators-to-the-messaging-interface-showing-whether-a-conversation-partner-is-a-friend-has-a-pending-request-or-is-not-a-friend",
+      "title": "Add friend status indicators to the messaging interface showing whether a conversation partner is a friend, has a pending request, or is not a friend",
+      "reqIds": [
+        "REQ-58"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-reduce-the-video-player-size-in-vidlespage-tsx-by-40-to-make-vertical-videos-fit-better-on-screen",
+      "title": "Reduce the video player size in VidlesPage.tsx by 40% to make vertical videos fit better on screen",
+      "reqIds": [
+        "REQ-59"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -417,6 +515,68 @@
       "id": "AR-22",
       "summary": "Add Enable/Disable button next to like button on videos that works as follow/subscribe with smooth animation between states",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Verify the backend deleteVideo mutation is properly connected and can successfully delete videos when called with a valid video ID",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Add friend system to SkelMsg with send/accept/decline friend requests, friends list, unfriend functionality, and friend status indicators",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "Add 'Add Friends' button in SkelMsg that opens a pop-up modal with a search bar to find users by username and send friend requests",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-28",
+      "summary": "Reduce Vidles video player size by 40% in VidlesPage so vertical videos fit better on screen",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-29",
+      "summary": "Add search section to SkelUlt where users can search for channels (user profiles) and videos by title/description/tags with YouTube-like search results",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-30",
+      "summary": "Add thumbnail upload option for videos and Vidles during upload, with thumbnail displaying when video is not playing",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Add friend request data model to backend/main.mo with fields for sender Principal, recipient Principal, status (pending/accepted/declined), and timestamp",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Implement backend functions to send friend requests, accept friend requests, decline friend requests, get pending friend requests, get accepted friends list, and unfriend (remove friendship)",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "Add backend searchUsers function that searches all registered users by username and returns matching user profiles with Principal ID, username, profile picture, and bio",
+      "reqIds": [
+        "REQ-51"
+      ],
       "status": "pending"
     }
   ],

@@ -1,12 +1,18 @@
 # Specification
 
 ## Summary
-**Goal:** Add SkelUlt logo to the header and implement an Enable/Disable follow button with smooth animation on video cards.
+**Goal:** Implement a friend system with user search, friend requests, and accepted friends management in SkelMsg, and reduce the Vidles video player size by 40%.
 
 **Planned changes:**
-- Add small SkelUlt logo to top-left corner of Layout header that displays consistently in light and dark modes
-- Add Enable button next to the like button on VideoCard component for following video creators
-- Implement smooth animation transitioning Enable button to Disable button on click
-- Enable Disable button to unfollow/unsubscribe from video creator's channel
+- Add friend request data model to backend with sender, recipient, status, and timestamp
+- Implement backend functions for sending, accepting, declining friend requests, getting friend requests/lists, unfriending, and searching users by username
+- Create React Query hooks for all friend system operations with proper caching and optimistic updates
+- Add "Add Friends" button to MessagingPage that opens a search modal
+- Create AddFriendsModal component with user search, results display, and send request functionality
+- Create FriendRequestsList component showing pending requests with accept/decline buttons
+- Create FriendsList component displaying accepted friends with unfriend buttons
+- Integrate friend requests and friends list into MessagingPage layout
+- Add friend status indicators to conversations showing friend, pending, or non-friend status
+- Reduce video player size in VidlesPage by 40% for better vertical video display
 
-**User-visible outcome:** Users will see the SkelUlt branding in the header and can follow/unfollow video creators using an animated Enable/Disable button next to the like button on each video card.
+**User-visible outcome:** Users can search for other users, send and receive friend requests, manage their friends list, and see friend status in conversations. Vidles vertical videos display more compactly on screen.

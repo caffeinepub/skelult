@@ -116,6 +116,12 @@ export interface _CaffeineStorageCreateCertificateResult {
     blob_hash: string;
 }
 export type UserId = Principal;
+export interface FriendRequest {
+    status: FriendRequestStatus;
+    recipient: UserId;
+    sender: UserId;
+    timestamp: Time;
+}
 export type VideoId = bigint;
 export interface Message {
     content: string;
@@ -140,6 +146,11 @@ export enum ContentType {
     video = "video",
     vidle = "vidle"
 }
+export enum FriendRequestStatus {
+    pending = "pending",
+    accepted = "accepted",
+    declined = "declined"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -153,14 +164,19 @@ export interface backendInterface {
     _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
+    acceptFriendRequest(sender: UserId): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     commentOnVideo(videoId: VideoId, text: string): Promise<void>;
+    declineFriendRequest(sender: UserId): Promise<void>;
+    deleteVideo(videoId: VideoId): Promise<void>;
     followUser(target: UserId): Promise<void>;
+    getAcceptedFriendsList(): Promise<Array<UserId>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getConversationPartners(): Promise<Array<Principal>>;
     getMessagesWith(otherUser: UserId): Promise<Array<Message>>;
     getMostLikedVideos(): Promise<Array<Video>>;
+    getPendingFriendRequests(): Promise<Array<FriendRequest>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getUserVideos(userId: UserId): Promise<Array<Video>>;
     getVideo(id: VideoId): Promise<Video | null>;
@@ -169,11 +185,14 @@ export interface backendInterface {
     likeVideo(videoId: VideoId): Promise<void>;
     register(username: string, bio: string, profilePic: ExternalBlob | null): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    searchUsers(searchTerm: string): Promise<Array<UserProfile>>;
+    sendFriendRequest(recipient: UserId): Promise<void>;
     sendMessage(recipient: UserId, content: string, videoLink: string | null): Promise<void>;
     unfollowUser(target: UserId): Promise<void>;
+    unfriend(friend: UserId): Promise<void>;
     uploadVideo(title: string, description: string, tags: Array<string>, videoFile: ExternalBlob, contentType: ContentType, durationSeconds: bigint, aspectRatio: number): Promise<void>;
 }
-import type { ContentType as _ContentType, ExternalBlob as _ExternalBlob, Message as _Message, Time as _Time, UserId as _UserId, UserProfile as _UserProfile, UserRole as _UserRole, Username as _Username, Video as _Video, VideoId as _VideoId, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { ContentType as _ContentType, ExternalBlob as _ExternalBlob, FriendRequest as _FriendRequest, FriendRequestStatus as _FriendRequestStatus, Message as _Message, Time as _Time, UserId as _UserId, UserProfile as _UserProfile, UserRole as _UserRole, Username as _Username, Video as _Video, VideoId as _VideoId, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -274,6 +293,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async acceptFriendRequest(arg0: UserId): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.acceptFriendRequest(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.acceptFriendRequest(arg0);
+            return result;
+        }
+    }
     async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
         if (this.processError) {
             try {
@@ -302,6 +335,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async declineFriendRequest(arg0: UserId): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.declineFriendRequest(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.declineFriendRequest(arg0);
+            return result;
+        }
+    }
+    async deleteVideo(arg0: VideoId): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteVideo(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteVideo(arg0);
+            return result;
+        }
+    }
     async followUser(arg0: UserId): Promise<void> {
         if (this.processError) {
             try {
@@ -313,6 +374,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.followUser(arg0);
+            return result;
+        }
+    }
+    async getAcceptedFriendsList(): Promise<Array<UserId>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAcceptedFriendsList();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAcceptedFriendsList();
             return result;
         }
     }
@@ -386,6 +461,20 @@ export class Backend implements backendInterface {
             return from_candid_vec_n21(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getPendingFriendRequests(): Promise<Array<FriendRequest>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPendingFriendRequests();
+                return from_candid_vec_n26(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPendingFriendRequests();
+            return from_candid_vec_n26(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
@@ -418,14 +507,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getVideo(arg0);
-                return from_candid_opt_n26(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n31(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getVideo(arg0);
-            return from_candid_opt_n26(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n31(this._uploadFile, this._downloadFile, result);
         }
     }
     async getVideoComments(arg0: VideoId): Promise<Array<Comment>> {
@@ -473,42 +562,70 @@ export class Backend implements backendInterface {
     async register(arg0: string, arg1: string, arg2: ExternalBlob | null): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.register(arg0, arg1, await to_candid_opt_n27(this._uploadFile, this._downloadFile, arg2));
+                const result = await this.actor.register(arg0, arg1, await to_candid_opt_n32(this._uploadFile, this._downloadFile, arg2));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.register(arg0, arg1, await to_candid_opt_n27(this._uploadFile, this._downloadFile, arg2));
+            const result = await this.actor.register(arg0, arg1, await to_candid_opt_n32(this._uploadFile, this._downloadFile, arg2));
             return result;
         }
     }
     async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.saveCallerUserProfile(await to_candid_UserProfile_n29(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.saveCallerUserProfile(await to_candid_UserProfile_n34(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.saveCallerUserProfile(await to_candid_UserProfile_n29(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.saveCallerUserProfile(await to_candid_UserProfile_n34(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async searchUsers(arg0: string): Promise<Array<UserProfile>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.searchUsers(arg0);
+                return from_candid_vec_n36(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.searchUsers(arg0);
+            return from_candid_vec_n36(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async sendFriendRequest(arg0: UserId): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.sendFriendRequest(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.sendFriendRequest(arg0);
             return result;
         }
     }
     async sendMessage(arg0: UserId, arg1: string, arg2: string | null): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.sendMessage(arg0, arg1, to_candid_opt_n31(this._uploadFile, this._downloadFile, arg2));
+                const result = await this.actor.sendMessage(arg0, arg1, to_candid_opt_n37(this._uploadFile, this._downloadFile, arg2));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.sendMessage(arg0, arg1, to_candid_opt_n31(this._uploadFile, this._downloadFile, arg2));
+            const result = await this.actor.sendMessage(arg0, arg1, to_candid_opt_n37(this._uploadFile, this._downloadFile, arg2));
             return result;
         }
     }
@@ -526,17 +643,31 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async uploadVideo(arg0: string, arg1: string, arg2: Array<string>, arg3: ExternalBlob, arg4: ContentType, arg5: bigint, arg6: number): Promise<void> {
+    async unfriend(arg0: UserId): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.uploadVideo(arg0, arg1, arg2, await to_candid_ExternalBlob_n28(this._uploadFile, this._downloadFile, arg3), to_candid_ContentType_n32(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
+                const result = await this.actor.unfriend(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.uploadVideo(arg0, arg1, arg2, await to_candid_ExternalBlob_n28(this._uploadFile, this._downloadFile, arg3), to_candid_ContentType_n32(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
+            const result = await this.actor.unfriend(arg0);
+            return result;
+        }
+    }
+    async uploadVideo(arg0: string, arg1: string, arg2: Array<string>, arg3: ExternalBlob, arg4: ContentType, arg5: bigint, arg6: number): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.uploadVideo(arg0, arg1, arg2, await to_candid_ExternalBlob_n33(this._uploadFile, this._downloadFile, arg3), to_candid_ContentType_n38(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.uploadVideo(arg0, arg1, arg2, await to_candid_ExternalBlob_n33(this._uploadFile, this._downloadFile, arg3), to_candid_ContentType_n38(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
             return result;
         }
     }
@@ -546,6 +677,12 @@ function from_candid_ContentType_n24(_uploadFile: (file: ExternalBlob) => Promis
 }
 async function from_candid_ExternalBlob_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
     return await _downloadFile(value);
+}
+function from_candid_FriendRequestStatus_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _FriendRequestStatus): FriendRequestStatus {
+    return from_candid_variant_n30(_uploadFile, _downloadFile, value);
+}
+function from_candid_FriendRequest_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _FriendRequest): FriendRequest {
+    return from_candid_record_n28(_uploadFile, _downloadFile, value);
 }
 function from_candid_Message_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Message): Message {
     return from_candid_record_n19(_uploadFile, _downloadFile, value);
@@ -571,7 +708,7 @@ async function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<
 function from_candid_opt_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
     return value.length === 0 ? null : value[0];
 }
-async function from_candid_opt_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Video]): Promise<Video | null> {
+async function from_candid_opt_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Video]): Promise<Video | null> {
     return value.length === 0 ? null : await from_candid_Video_n22(_uploadFile, _downloadFile, value[0]);
 }
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
@@ -661,6 +798,24 @@ async function from_candid_record_n23(_uploadFile: (file: ExternalBlob) => Promi
         aspectRatio: value.aspectRatio
     };
 }
+function from_candid_record_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    status: _FriendRequestStatus;
+    recipient: _UserId;
+    sender: _UserId;
+    timestamp: _Time;
+}): {
+    status: FriendRequestStatus;
+    recipient: UserId;
+    sender: UserId;
+    timestamp: Time;
+} {
+    return {
+        status: from_candid_FriendRequestStatus_n29(_uploadFile, _downloadFile, value.status),
+        recipient: value.recipient,
+        sender: value.sender,
+        timestamp: value.timestamp
+    };
+}
 function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     success: [] | [boolean];
     topped_up_amount: [] | [bigint];
@@ -689,20 +844,35 @@ function from_candid_variant_n25(_uploadFile: (file: ExternalBlob) => Promise<Ui
 }): ContentType {
     return "video" in value ? ContentType.video : "vidle" in value ? ContentType.vidle : value;
 }
+function from_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    pending: null;
+} | {
+    accepted: null;
+} | {
+    declined: null;
+}): FriendRequestStatus {
+    return "pending" in value ? FriendRequestStatus.pending : "accepted" in value ? FriendRequestStatus.accepted : "declined" in value ? FriendRequestStatus.declined : value;
+}
 function from_candid_vec_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Message>): Array<Message> {
     return value.map((x)=>from_candid_Message_n18(_uploadFile, _downloadFile, x));
 }
 async function from_candid_vec_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Video>): Promise<Array<Video>> {
     return await Promise.all(value.map(async (x)=>await from_candid_Video_n22(_uploadFile, _downloadFile, x)));
 }
-function to_candid_ContentType_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ContentType): _ContentType {
-    return to_candid_variant_n33(_uploadFile, _downloadFile, value);
+function from_candid_vec_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_FriendRequest>): Array<FriendRequest> {
+    return value.map((x)=>from_candid_FriendRequest_n27(_uploadFile, _downloadFile, x));
 }
-async function to_candid_ExternalBlob_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
+async function from_candid_vec_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_UserProfile>): Promise<Array<UserProfile>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_UserProfile_n11(_uploadFile, _downloadFile, x)));
+}
+function to_candid_ContentType_n38(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ContentType): _ContentType {
+    return to_candid_variant_n39(_uploadFile, _downloadFile, value);
+}
+async function to_candid_ExternalBlob_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
     return await _uploadFile(value);
 }
-async function to_candid_UserProfile_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): Promise<_UserProfile> {
-    return await to_candid_record_n30(_uploadFile, _downloadFile, value);
+async function to_candid_UserProfile_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): Promise<_UserProfile> {
+    return await to_candid_record_n35(_uploadFile, _downloadFile, value);
 }
 function to_candid_UserRole_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n9(_uploadFile, _downloadFile, value);
@@ -713,10 +883,10 @@ function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: Exte
 function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
     return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
 }
-async function to_candid_opt_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob | null): Promise<[] | [_ExternalBlob]> {
-    return value === null ? candid_none() : candid_some(await to_candid_ExternalBlob_n28(_uploadFile, _downloadFile, value));
+async function to_candid_opt_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob | null): Promise<[] | [_ExternalBlob]> {
+    return value === null ? candid_none() : candid_some(await to_candid_ExternalBlob_n33(_uploadFile, _downloadFile, value));
 }
-function to_candid_opt_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
+function to_candid_opt_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
     return value === null ? candid_none() : candid_some(value);
 }
 function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -728,7 +898,7 @@ function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
         proposed_top_up_amount: value.proposed_top_up_amount ? candid_some(value.proposed_top_up_amount) : candid_none()
     };
 }
-async function to_candid_record_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+async function to_candid_record_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     bio: string;
     username: Username;
     followers: bigint;
@@ -746,10 +916,10 @@ async function to_candid_record_n30(_uploadFile: (file: ExternalBlob) => Promise
         username: value.username,
         followers: value.followers,
         following: value.following,
-        profilePicture: value.profilePicture ? candid_some(await to_candid_ExternalBlob_n28(_uploadFile, _downloadFile, value.profilePicture)) : candid_none()
+        profilePicture: value.profilePicture ? candid_some(await to_candid_ExternalBlob_n33(_uploadFile, _downloadFile, value.profilePicture)) : candid_none()
     };
 }
-function to_candid_variant_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ContentType): {
+function to_candid_variant_n39(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ContentType): {
     video: null;
 } | {
     vidle: null;

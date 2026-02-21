@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-the-skelult-logo-bold-geometric-text-with-cyan-ult-accent-to-the-top-left-corner-of-the-layout-component-header-ensuring-it-is-small-in-size-and-displays-consistently-in-both-light-and-dark-modes",
-      "featureTitle": "Add the SkelUlt logo (bold geometric text with cyan 'ULT' accent) to the top-left corner of the Layout component header, ensuring it is small in size and displays consistently in both light and dark modes",
+      "featureId": "feature-create-react-query-hooks-in-usequeries-ts-for-friend-system-operations-usesendfriendrequest-useacceptfriendrequest-usedeclinefriendrequest-usegetfriendrequests-usegetfriendslist-useunfriend-and-usesearchusers",
+      "featureTitle": "Create React Query hooks in useQueries.ts for friend system operations: useSendFriendRequest, useAcceptFriendRequest, useDeclineFriendRequest, useGetFriendRequests, useGetFriendsList, useUnfriend, and useSearchUsers",
       "files": [
-        "frontend/src/components/Layout.tsx"
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,15 +17,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-40"
+        "REQ-52"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-an-enable-button-next-to-the-like-button-on-all-videos-in-videocard-component-that-allows-users-to-follow-subscribe-to-the-video-creator-s-channel",
-      "featureTitle": "Add an Enable button next to the like button on all videos in VideoCard component that allows users to follow/subscribe to the video creator's channel",
+      "featureId": "feature-add-add-friends-button-to-the-messagingpage-component-that-opens-a-modal-dialog-with-a-search-bar-to-find-users-by-username",
+      "featureTitle": "Add 'Add Friends' button to the MessagingPage component that opens a modal dialog with a search bar to find users by username",
       "files": [
-        "frontend/src/components/VideoCard.tsx"
+        "frontend/src/pages/MessagingPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -37,15 +37,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-41"
+        "REQ-53"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-smooth-animation-for-the-enable-disable-button-that-transforms-the-button-state-from-enable-to-disable-on-click-with-visual-transition-effects",
-      "featureTitle": "Implement smooth animation for the Enable/Disable button that transforms the button state from 'Enable' to 'Disable' on click with visual transition effects",
+      "featureId": "feature-create-addfriendsmodal-component-that-displays-a-search-bar-and-shows-search-results-with-user-avatars-usernames-and-send-request-buttons-for-each-user",
+      "featureTitle": "Create AddFriendsModal component that displays a search bar and shows search results with user avatars, usernames, and 'Send Request' buttons for each user",
       "files": [
-        "frontend/src/components/VideoCard.tsx"
+        "frontend/src/components/AddFriendsModal.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -57,15 +57,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-42"
+        "REQ-54"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-disable-button-functionality-that-allows-users-to-unfollow-unsubscribe-from-the-video-creator-s-channel-when-clicked-in-the-disable-state",
-      "featureTitle": "Implement Disable button functionality that allows users to unfollow/unsubscribe from the video creator's channel when clicked in the Disable state",
+      "featureId": "feature-create-friendrequestslist-component-that-displays-pending-friend-requests-with-accept-and-decline-buttons-for-each-request",
+      "featureTitle": "Create FriendRequestsList component that displays pending friend requests with accept and decline buttons for each request",
       "files": [
-        "frontend/src/components/VideoCard.tsx"
+        "frontend/src/components/FriendRequestsList.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -77,7 +77,88 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-43"
+        "REQ-55"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-friendslist-component-that-displays-all-accepted-friends-with-profile-pictures-usernames-and-unfriend-buttons",
+      "featureTitle": "Create FriendsList component that displays all accepted friends with profile pictures, usernames, and unfriend buttons",
+      "files": [
+        "frontend/src/components/FriendsList.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-56"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-integrate-friendrequestslist-and-friendslist-components-into-the-messagingpage-layout-displaying-them-alongside-the-conversation-list",
+      "featureTitle": "Integrate FriendRequestsList and FriendsList components into the MessagingPage layout, displaying them alongside the conversation list",
+      "files": [
+        "frontend/src/pages/MessagingPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-57"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-friend-status-indicators-to-the-messaging-interface-showing-whether-a-conversation-partner-is-a-friend-has-a-pending-request-or-is-not-a-friend",
+      "featureTitle": "Add friend status indicators to the messaging interface showing whether a conversation partner is a friend, has a pending request, or is not a friend",
+      "files": [
+        "frontend/src/components/ChatThread.tsx",
+        "frontend/src/components/ConversationList.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-58"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-reduce-the-video-player-size-in-vidlespage-tsx-by-40-to-make-vertical-videos-fit-better-on-screen",
+      "featureTitle": "Reduce the video player size in VidlesPage.tsx by 40% to make vertical videos fit better on screen",
+      "files": [
+        "frontend/src/pages/VidlesPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-59"
       ],
       "confidence": "high"
     }
